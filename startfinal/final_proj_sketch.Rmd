@@ -1,5 +1,5 @@
 ---
-title: "Spotify Top Artists/Songs of 2024"
+title: "Spotify Top Artists/Songs of 2024 Globally"
 output: html_document
 ---
 
@@ -129,11 +129,11 @@ all_tracks |>
 ```
 
 ## Research Questions:
-1. What are the most popular songs by selected artist?
+1. What are the most popular songs from each top artist?
 2. Do explicit tracks tend to have higher or lower popularity scores than non-explicit tracks?
-3. 
-4.
-5.
+3. Is there a relationship between the number of tracks in an album and its popularity score?
+4. Does the month that an album is released impact their popularity?
+5. What are the most popular songs from each top album?
 
 ## Resources:
 1. Revealed: The Top Artists, Songs, Albums, Podcasts, and Audiobooks of 2024 (https://newsroom.spotify.com/2024-12-04/top-songs-artists-podcasts-audiobooks-albums-trends-2024/)
