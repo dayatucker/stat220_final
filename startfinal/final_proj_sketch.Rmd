@@ -110,22 +110,27 @@ datatable(top_tracks |>
 ## Popularity by Track Name (Color by Explicit)
 
 ```{r}
-all_tracks_2024 |>
-  filter(artist_name == "Taylor Swift") |>
-  plot_ly(
-        x = ~reorder(track_name, popularity),
-        y = ~popularity,
-        type = 'bar',
-        color = ~explicit,
-        colors = c('blue', 'red'),
-        text = ~paste("Track:", track_name,
-                      "\nArtist:", artist_name,
-                      "\nPopularity:", popularity,
-                      "\nExplicit:", explicit),
-        hoverinfo = "text") |>
-  layout(title = "Top Tracks by Popularity",
-         xaxis = list(title = "Track Name", tickangle = -45),
-         yaxis = list(title = "Popularity"))
+ts_tracks_2024 <- all_tracks_2024 |>
+  filter(artist_name == "Taylor Swift")
+
+popular_tracks_2024 <- ggplot(ts_tracks_2024, aes(
+  x = reorder(track_name, popularity),
+  y = popularity,
+  fill = explicit,
+  text = paste0(
+    "Track: ", track_name, "\n",
+    "Artist: ", artist_name, "\n",
+    "Popularity: ", popularity, "\n",
+    "Explicit: ", ifelse(explicit, "Yes", "No")
+  )
+)) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "Top Tracks by Popularity", x = "Track Name", y = "Popularity") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(popular_tracks_2024, tooltip = "text")
+
 ```
 
 ## Research Questions:
