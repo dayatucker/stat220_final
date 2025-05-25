@@ -117,7 +117,7 @@ popular_tracks_2024 <- ggplot(ts_tracks_2024, aes(
   x = reorder(track_name, popularity),
   y = popularity,
   fill = explicit,
-  text = paste0(
+  text = str_c(
     "Track: ", track_name, "\n",
     "Artist: ", artist_name, "\n",
     "Popularity: ", popularity, "\n",
