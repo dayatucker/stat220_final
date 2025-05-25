@@ -1,5 +1,5 @@
 ---
-title: "Spotify Artist Explorer"
+title: "Spotify Top Artists/Songs of 2024"
 output: html_document
 ---
 
@@ -127,6 +127,13 @@ all_tracks |>
          xaxis = list(title = "Track Name", tickangle = -45),
          yaxis = list(title = "Popularity"))
 ```
+
+## Research Questions:
+1. What are the most popular songs by selected artist?
+2. Do explicit tracks tend to have higher or lower popularity scores than non-explicit tracks?
+3. 
+4.
+5.
 
 ## Resources:
 1. Revealed: The Top Artists, Songs, Albums, Podcasts, and Audiobooks of 2024 (https://newsroom.spotify.com/2024-12-04/top-songs-artists-podcasts-audiobooks-albums-trends-2024/)
