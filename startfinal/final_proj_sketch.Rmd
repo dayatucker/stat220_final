@@ -73,7 +73,7 @@ get_artist_top_tracks <- function(artist_id, token) {
   })
 }
 
-artist_ids <- c(
+artist_ids_2024 <- c(
   "06HL4z0CvFAxyc27GXpf02",  # Taylor Swift
   "1Xyo4u8uXC1ZmMpatF05PJ",  # The Weeknd
   "4q3ewBCX7sLwd24euuV69X",  # Bad Bunny
@@ -86,21 +86,21 @@ artist_ids <- c(
   "2LRoIwlKmHjgvigdNGBHNo"   # Feid
 )
 
-artists_data <- get_artists_data(artist_ids, token)
-all_tracks <- map_dfr(artist_ids, get_artist_top_tracks, token = token)
+artists_data_2024 <- get_artists_data(artist_ids_2024, token)
+all_tracks_2024 <- map_dfr(artist_ids_2024, get_artist_top_tracks, token = token)
 
 # Merge track data with artist names
-all_tracks <- left_join(all_tracks, artists_data |> select(artist_id, artist_name), by = "artist_id")
+all_tracks_2024 <- left_join(all_tracks_2024, artists_data_2024 |> select(artist_id, artist_name), by = "artist_id")
 ```
 
 
 ## Top 10 Most Popular Songs (All Artists)
 
 ```{r}
-top10_tracks <- all_tracks |> 
+top_tracks <- all_tracks_2024 |> 
   arrange(desc(popularity))
 
-datatable(top10_tracks |> 
+datatable(top_tracks |> 
             select(Track = track_name,
                    Artist = artist_name,
                    Popularity = popularity,
@@ -110,7 +110,7 @@ datatable(top10_tracks |>
 ## Popularity by Track Name (Color by Explicit)
 
 ```{r}
-all_tracks |>
+all_tracks_2024 |>
   filter(artist_name == "Taylor Swift") |>
   plot_ly(
         x = ~reorder(track_name, popularity),
