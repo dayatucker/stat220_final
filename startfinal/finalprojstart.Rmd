@@ -1,0 +1,400 @@
+---
+title: "finalprojstart"
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  echo = TRUE
+)
+q <- 0
+```
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(tidycensus)
+library(patchwork)
+library(ggthemes)
+library(rvest)
+library(janitor)
+library(lubridate)
+library(httr2)
+library(spotifyr)
+# library(devtools)
+# install_github("charlie86/spotifyr")
+library(purrr)
+```
+
+```{r}
+client_id <- readLines("spotify_client_id.txt")
+client_secret <- readLines("spotify_client_secret.txt")
+
+get_spotify_token <- function(client_id, client_secret) {
+  resp <- request("https://accounts.spotify.com/api/token") |>
+    req_auth_basic(client_id, client_secret) |>
+    req_body_form(grant_type = "client_credentials") |>
+    req_method("POST") |>
+    req_perform()
+  
+  resp_body_json(resp)$access_token
+}
+
+token <- get_spotify_token(client_id, client_secret)
+```
+
+# 2024 Top 10 Albums
+```{r}
+# Function to get album data
+get_albums_data <- function(album_ids) {
+  req <- request("https://api.spotify.com/v1/albums") |>
+    req_url_query(ids = paste(album_ids, collapse = ",")) |>
+    req_headers(Authorization = paste("Bearer", token))
+
+  resp <- req_perform(req)
+
+  albums <- resp |>
+    resp_body_json(simplifyVector = FALSE) |>
+    (\(x) x$albums)()
+
+  map_dfr(albums, function(album) {
+    tibble(
+      album_id = album$id,
+      album_name = album$name,
+      artist_id = album$artists[[1]]$id,
+      artist_name = album$artists[[1]]$name,
+      release_date = ymd(album$release_date),
+      total_tracks = album$total_tracks,
+      genre = paste(artist$genres, collapse = ", ")
+    )
+  })
+}
+
+# Function to get genres for each artist
+get_artist_genres <- function(artist_id) {
+  req <- request(paste0("https://api.spotify.com/v1/artists/", artist_id)) |>
+    req_headers(Authorization = paste("Bearer", token))
+
+  resp <- req_perform(req)
+
+  genres <- resp |>
+    resp_body_json(simplifyVector = TRUE) |>
+    (\(x) x$genres)()
+
+  return(paste(genres, collapse = ", "))
+}
+
+# Add genres to album data
+album_data2 <- album_data |>
+  rowwise() |>
+  mutate(genres = get_artist_genres(artist_id)) |>
+  ungroup()
+
+album_ids <- c(
+  "5H7ixXZfsNMGbIE5OBSpcb",
+  "7aJuG4TFXa2hmE4z1yxc3n",
+  "3iPSVi54hsacKKl1xIR2eH",
+  "4kS7bSuU0Jm9LYMosFU2x5",
+  "5EYKrEDnKhhcNxGedaRQeK",
+  "64LU4c1nfjz1t4VnGhagcg",
+  "07w0rG5TETcyihsEIZR3qG",
+  "1NAmidJlEaVgA3MpcPFYGq",
+  "168CdR21lfn0TTyw1Pkdcm",
+  "2ODvWsOgouMbaA5xf0RkJe")
+album_data <- get_albums_data(album_ids)
+```
+
+# How have album release patterns changed over recent years?
+```{r}
+album_data %>%
+  mutate(year = year(release_date), month = month(release_date, label = TRUE)) %>%
+  ggplot(aes(x = factor(year))) +
+  geom_bar() +
+  labs(title = "Number of Album Releases by Year", x = "Year", y = "Number of Albums")
+```
+
+# What genres dominate the top albums and playlists of 2024?
+```{r}
+album_data2 %>%
+  separate_rows(genres, sep = ", ") %>%
+  count(genres, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  ggplot(aes(x = reorder(genres, n), y = n)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Top Genres in 2024 Top Albums", x = "Genre", y = "Count")
+```
+
+
+# Search by Album Name (1 at a time)
+```{r}
+query <- "1989"
+
+search_request <- request("https://api.spotify.com/v1/search") |>
+  req_url_query(q = query, type = "album", limit = 5) |>
+  req_headers(Authorization = paste("Bearer", token))
+
+search_response <- req_perform(search_request)
+
+results <- search_response |>
+  resp_body_json(simplifyVector = TRUE)
+
+albums <- results$albums$items
+
+# Extract album IDs and names
+album_tbl <- tibble::tibble(
+  id = albums$id,
+  name = albums$name,
+  artist = sapply(albums$artists, \(a) paste(a$name, collapse = ", ")),
+  release_date = albums$release_date
+)
+
+print(album_tbl)
+```
+
+# Search Multiple Albums
+```{r}
+queries <- c("1989", "Short n’ Sweet")
+
+get_albums <- function(query, token) {
+  search_request <- request("https://api.spotify.com/v1/search") |>
+    req_url_query(q = query, type = "album", limit = 5) |>
+    req_headers(Authorization = paste("Bearer", token))
+  
+  search_response <- req_perform(search_request)
+  results <- search_response |>
+    resp_body_json(simplifyVector = TRUE)
+  
+  albums <- results$albums$items
+  
+  tibble(
+    id = albums$id,
+    name = albums$name,
+    artist = sapply(albums$artists, \(a) paste(a$name, collapse = ", ")),
+    release_date = albums$release_date,
+    query = query
+  )
+}
+
+album_tbl <- map_dfr(queries, ~ get_albums(.x, token))
+
+print(album_tbl)
+```
+
+# Plot Album Name by Release Year
+```{r}
+# Ensure release_date is a date object
+album_tbl$release_date <- ymd(album_tbl$release_date)
+
+# Extract year
+album_tbl$release_year <- year(album_tbl$release_date)
+
+# Plot
+ggplot(album_tbl, aes(x = factor(release_year), fill = artist)) +
+  geom_bar() +
+  labs(
+    title = "Albums Named '1989' by Release Year",
+    x = "Release Year",
+    y = "Number of Albums",
+    fill = "Artist"
+  ) +
+  theme_minimal()
+```
+
+
+# "Which artists have the most tracks in top playlists, and how do their popularity and follower counts compare?"
+```{r}
+# Count tracks per artist
+top_artists <- playlist_tracks %>%
+  count(artist_name, artist_id, sort = TRUE)
+
+# Plot top 10 artists by number of tracks
+top_artists %>%
+  slice_max(n, n = 10) %>%
+  ggplot(aes(x = reorder(artist_name, n), y = n, fill = artist_name)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(
+    title = "Top 10 Artists by Track Count in Playlist",
+    x = "Artist",
+    y = "Number of Tracks"
+  ) +
+  theme_minimal()
+```
+
+
+
+# Plots for the 2024 Top Songs Playlist
+```{r}
+# Histogram of track durations in minutes
+playlist_tracks %>%
+  mutate(duration_min = track_duration_ms / 60000) %>%
+  ggplot(aes(x = duration_min)) +
+  geom_histogram(binwidth = 0.5, fill = "steelblue", color = "black") +
+  labs(
+    title = "Distribution of Track Durations in Playlist",
+    x = "Duration (minutes)",
+    y = "Number of Tracks"
+  ) +
+  theme_minimal()
+
+# Bar plot of explicit vs non-explicit tracks
+playlist_tracks %>%
+  mutate(explicit = ifelse(track_explicit, "Explicit", "Not Explicit")) %>%
+  count(explicit) %>%
+  ggplot(aes(x = explicit, y = n, fill = explicit)) +
+  geom_col() +
+  labs(
+    title = "Explicit Content in Playlist Tracks",
+    x = "Explicit",
+    y = "Count of Tracks"
+  ) +
+  scale_fill_manual(values = c("tomato", "forestgreen")) +
+  theme_minimal()
+
+# Top 10 artists by number of tracks in playlist
+playlist_tracks %>%
+  count(artist_name, sort = TRUE) %>%
+  slice_head(n = 10) %>%
+  ggplot(aes(x = reorder(artist_name, n), y = n, fill = artist_name)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  labs(
+    title = "Top 10 Artists by Number of Tracks in Playlist",
+    x = "Artist",
+    y = "Number of Tracks"
+  ) +
+  theme_minimal()
+```
+
+
+```{r}
+get_artist_genres <- function(artist_ids, token) {
+  split_ids <- split(artist_ids, ceiling(seq_along(artist_ids) / 50))
+  
+  map_dfr(split_ids, function(ids_chunk) {
+    req <- request("https://api.spotify.com/v1/artists") |>
+      req_url_query(ids = paste(ids_chunk, collapse = ",")) |>
+      req_headers(Authorization = paste("Bearer", token))
+    
+    resp <- req_perform(req)
+    content <- resp_body_json(resp, simplifyVector = FALSE)
+    
+    map_dfr(content$artists, function(artist) {
+      tibble(
+        artist_id = artist$id,
+        artist_name = artist$name,
+        genres = paste(artist$genres, collapse = ", ")
+      )
+    })
+  })
+}
+```
+
+# Top 2024 Songs Playlist with Genres Column Added
+```{r}
+# 1. Get unique artist IDs from tracks
+artist_ids <- unique(playlist_tracks$artist_id)
+
+# 2. Get genres for those artists
+artist_genres <- get_artist_genres(artist_ids, token)
+
+# 3. Join genres back to tracks by artist_id
+tracks_with_genres <- playlist_tracks |>
+  left_join(artist_genres, by = "artist_id")
+```
+
+# Top Songs Of 1 Artist (with Popularity rating)
+```{r}
+get_artist_top_tracks <- function(artist_id, token, market = "US") {
+  url <- paste0("https://api.spotify.com/v1/artists/", artist_id, "/top-tracks")
+  
+  req <- request(url) |>
+    req_url_query(market = market) |>
+    req_headers(Authorization = paste("Bearer", token))
+  
+  resp <- req_perform(req)
+  
+  content <- resp_body_json(resp, simplifyVector = FALSE)
+  
+  tracks <- content$tracks
+  
+  map_dfr(tracks, function(track) {
+    tibble(
+      track_id = track$id,
+      track_name = track$name,
+      album_id = track$album$id,
+      album_name = track$album$name,
+      artist_id = track$artists[[1]]$id,
+      artist_name = track$artists[[1]]$name,
+      track_duration_ms = track$duration_ms,
+      track_explicit = track$explicit,
+      popularity = track$popularity,
+      preview_url = track$preview_url
+    )
+  })
+}
+
+# Usage example:
+artist_id <- "06HL4z0CvFAxyc27GXpf02"  # Taylor Swift's artist ID
+# token <- "your_access_token_here"
+top_tracks <- get_artist_top_tracks(artist_id, token, market = "US")
+```
+
+# Top 10 Artists + Genre + Popularity
+```{r}
+get_artists_data <- function(artist_ids, token) {
+  # Spotify API allows max 50 artist IDs per request, so split if needed
+  artist_chunks <- split(artist_ids, ceiling(seq_along(artist_ids) / 50))
+  
+  map_dfr(artist_chunks, function(ids_chunk) {
+    req <- request("https://api.spotify.com/v1/artists") |>
+      req_url_query(ids = paste(ids_chunk, collapse = ",")) |>
+      req_headers(Authorization = paste("Bearer", token))
+    
+    resp <- req_perform(req)
+    content <- resp_body_json(resp, simplifyVector = FALSE)
+    
+    artists <- content$artists
+    
+    map_dfr(artists, function(artist) {
+      tibble(
+        artist_id = artist$id,
+        artist_name = artist$name,
+        genres = paste(artist$genres, collapse = ", "),
+        popularity = artist$popularity,
+        followers = artist$followers$total,
+        artist_url = artist$external_urls$spotify
+      )
+    })
+  })
+}
+
+# Usage example:
+artist_ids <- c("06HL4z0CvFAxyc27GXpf02", "1Xyo4u8uXC1ZmMpatF05PJ", "4q3ewBCX7sLwd24euuV69X", "3TVXtAsR1Inumwj472S9r4", "6qqNVTkY8uBg9cP3Jd7DAH", "0Y5tJX1MQlPlqiwlOH1tJY", "12GqGscKJx3aE4t07u7eVZ", "5K4W6rqBFWDnAN6FQUkS6x", "66CXWjxzNUsdJxJ2JdwvnR", "2LRoIwlKmHjgvigdNGBHNo") 
+# token <- "your_access_token_here"
+artists_data <- get_artists_data(artist_ids, token)
+```
+
+```{r}
+# Merge artist metadata with track count
+artist_summary <- top_artists %>%
+  left_join(artists_data, by = "artist_id")
+
+# Scatter plot
+ggplot(artist_summary, aes(x = followers, y = popularity, size = n, color = artist_name.x)) +
+  geom_point(alpha = 0.8, show.legend = FALSE) +
+  scale_x_log10(labels = scales::label_comma()) +
+  labs(
+    title = "Artist Popularity vs Followers",
+    subtitle = "Bubble size = Number of Tracks in Playlist",
+    x = "Followers (log scale)",
+    y = "Popularity"
+  ) +
+  theme_minimal()
+```
+
+
+
+
