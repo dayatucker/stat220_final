@@ -1,5 +1,5 @@
 ---
-title: "Spotify Artist Explorer"
+title: "Spotify Top Artists/Songs of 2024 Globally"
 output: html_document
 ---
 
@@ -73,7 +73,7 @@ get_artist_top_tracks <- function(artist_id, token) {
   })
 }
 
-artist_ids <- c(
+artist_ids_2024 <- c(
   "06HL4z0CvFAxyc27GXpf02",  # Taylor Swift
   "1Xyo4u8uXC1ZmMpatF05PJ",  # The Weeknd
   "4q3ewBCX7sLwd24euuV69X",  # Bad Bunny
@@ -86,21 +86,21 @@ artist_ids <- c(
   "2LRoIwlKmHjgvigdNGBHNo"   # Feid
 )
 
-artists_data <- get_artists_data(artist_ids, token)
-all_tracks <- map_dfr(artist_ids, get_artist_top_tracks, token = token)
+artists_data_2024 <- get_artists_data(artist_ids_2024, token)
+all_tracks_2024 <- map_dfr(artist_ids_2024, get_artist_top_tracks, token = token)
 
 # Merge track data with artist names
-all_tracks <- left_join(all_tracks, artists_data |> select(artist_id, artist_name), by = "artist_id")
+all_tracks_2024 <- left_join(all_tracks_2024, artists_data_2024 |> select(artist_id, artist_name), by = "artist_id")
 ```
 
 
 ## Top 10 Most Popular Songs (All Artists)
 
 ```{r}
-top10_tracks <- all_tracks |> 
+top_tracks <- all_tracks_2024 |> 
   arrange(desc(popularity))
 
-datatable(top10_tracks |> 
+datatable(top_tracks |> 
             select(Track = track_name,
                    Artist = artist_name,
                    Popularity = popularity,
@@ -110,23 +110,35 @@ datatable(top10_tracks |>
 ## Popularity by Track Name (Color by Explicit)
 
 ```{r}
-all_tracks |>
-  filter(artist_name == "Taylor Swift") |>
-  plot_ly(
-        x = ~reorder(track_name, popularity),
-        y = ~popularity,
-        type = 'bar',
-        color = ~explicit,
-        colors = c('blue', 'red'),
-        text = ~paste("Track:", track_name,
-                      "\nArtist:", artist_name,
-                      "\nPopularity:", popularity,
-                      "\nExplicit:", explicit),
-        hoverinfo = "text") |>
-  layout(title = "Top Tracks by Popularity",
-         xaxis = list(title = "Track Name", tickangle = -45),
-         yaxis = list(title = "Popularity"))
+ts_tracks_2024 <- all_tracks_2024 |>
+  filter(artist_name == "Taylor Swift")
+
+popular_tracks_2024 <- ggplot(ts_tracks_2024, aes(
+  x = reorder(track_name, popularity),
+  y = popularity,
+  fill = explicit,
+  text = str_c(
+    "Track: ", track_name, "\n",
+    "Artist: ", artist_name, "\n",
+    "Popularity: ", popularity, "\n",
+    "Explicit: ", ifelse(explicit, "Yes", "No")
+  )
+)) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "Top Tracks by Popularity", x = "Track Name", y = "Popularity") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplotly(popular_tracks_2024, tooltip = "text")
+
 ```
+
+## Research Questions:
+1. What are the most popular songs from each top artist?
+2. Do explicit tracks tend to have higher or lower popularity scores than non-explicit tracks?
+3. Is there a relationship between the number of tracks in an album and its popularity score?
+4. Does the month that an album is released impact their popularity?
+5. What are the most popular songs from each top album?
 
 ## Resources:
 1. Revealed: The Top Artists, Songs, Albums, Podcasts, and Audiobooks of 2024 (https://newsroom.spotify.com/2024-12-04/top-songs-artists-podcasts-audiobooks-albums-trends-2024/)
