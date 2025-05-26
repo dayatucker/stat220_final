@@ -10,6 +10,15 @@ library(plotly)
 library(DT)
 ```
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE,
+  echo = TRUE
+)
+q <- 0
+```
+
 ```{r}
 client_id <- readLines("spotify_client_id.txt")
 client_secret <- readLines("spotify_client_secret.txt")
