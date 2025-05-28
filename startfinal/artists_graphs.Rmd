@@ -187,8 +187,9 @@ artist_ids_2024 <- c(
 selected_artist <- "Drake"
 
 # Filter tracks for the selected artist
-artist_top_tracks <- combined_tracks %>%
-  filter(artist_name == selected_artist)
+artist_top_tracks <- combined_tracks |>
+  filter(artist_name == selected_artist) |>
+  distinct(track_name, .keep_all = TRUE)
 
 # Create ggplot with custom text for tooltip
 artist_tracks_plot <- ggplot(
@@ -226,14 +227,14 @@ ggplotly(artist_tracks_plot, tooltip = "text")
 selected_artist <- "Taylor Swift"
 
 # Filter unique tracks for the selected artist
-top_tracks_duration <- combined_tracks %>%
-  filter(artist_name == selected_artist) %>%
-  distinct(track_name, .keep_all = TRUE) %>%
+top_tracks_duration <- combined_tracks |>
+  filter(artist_name == selected_artist) |>
+  distinct(track_name, .keep_all = TRUE) |>
   mutate(duration_min = track_duration_ms / 60000)
 
 # Plot of popularity vs duration for the selected artist
 top_tracks_duration_plot <- ggplot(
-  artist_top_tracks,
+  top_tracks_duration,
   aes(
     x = duration_min,
     y = popularity,
