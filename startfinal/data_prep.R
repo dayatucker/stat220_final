@@ -50,7 +50,7 @@ get_artists_data <- function(artist_ids, token) {
 
 # Function to include the top tracks of the artists
 get_artist_top_tracks <- function(artist_id, token) {
-  url <- paste0("https://api.spotify.com/v1/artists/", artist_id, "/top-tracks?market=US")
+  url <- str_c("https://api.spotify.com/v1/artists/", artist_id, "/top-tracks?market=US")
   
   req <- request(url) |>
     req_headers(Authorization = paste("Bearer", token))
@@ -260,7 +260,7 @@ get_album_data <- function(album_ids, token) {
 # Collecting track data for a given album via function
 get_album_tracks <- function(album_id, token) {
   
-  url <- paste0("https://api.spotify.com/v1/albums/", album_id, "/tracks")
+  url <- str_c("https://api.spotify.com/v1/albums/", album_id, "/tracks")
   
   req <- GET(
     url,
@@ -291,24 +291,24 @@ years <- 2018:2024
 # Loop through each year to create album_data_YYYY and album_tracks_YYYY
 for (year in years) {
   # Get the album_ids for the current year
-  album_ids <- get(paste0("album_ids_", year))
+  album_ids <- get(str_c("album_ids_", year))
   
   # Create album_data_YYYY
   assign(
-    paste0("album_data_", year),
+    str_c("album_data_", year),
     get_album_data(album_ids, token)
   )
   
   # Create album_tracks_YYYY
   assign(
-    paste0("album_tracks_", year),
+    str_c("album_tracks_", year),
     map_dfr(album_ids, get_album_tracks, token = token)
   )
   
   # Create combined_YYY
   assign(
-    paste0("combined_", year), 
-    left_join(get(paste0("album_data_", year)), get(paste0("album_tracks_", year)), by = "album_id")
+    str_c("combined_", year), 
+    left_join(get(str_c("album_data_", year)), get(str_c("album_tracks_", year)), by = "album_id")
   )
 }
 
