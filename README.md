@@ -2,27 +2,17 @@
 Repo for final project for Stat220
 
 ## Files
-- combined.R: makes graphs from all_tracks dataset
-- combinedplaylists.Rmd: gets all top songs from 2014-2024
-- explicit.R: makes bar graph of all explicit songs from 2014-2024
-- final_proj_sketch.Rmd: turn in for project sketch
-- final_proj_checkin.R: shiny of Rmd ^^
-- followers_popularity.R: makes a plot that shows followers v. popularity for each song
-- test.R: gets arists & playlists data and combines into 1 dataset to make a shiny (Doesnt work rn)
-- topartists.R: gets all_tracks dataset and displays as shiny interactive
+- `data_prep.R`: Contains code for wrangling and cleaning raw data
+- `main.Rmd`: Main file for graphs and visualizations for the report
+- - `/data/`: Folder containing all datasets in csv
+- `final_proj_sketch.Rmd`: turn in for project sketch
+- `.txt` files: Delete later
 
 ## Datasets
-### all_tracks
-Top 10 songs from top 10 artists in 2024
-- (chr) track name
-- (chr) album name
-- (int) popularity score (number out of 100 calculated by algorithm based on # plays and how recent they are)
-- (chr) artist name
-- (bool) explicit
-- (int) duration of track in milliseconds
+### dataset 1
+Description
+- dataset 1 info
 
-### arists_data
-Top 10 most streamed artists from 2024
-- (chr) artist name
-- (chr) genre (this is a bad variable, do not use)
-- (int) popularity in number of followers
+### dataset 2
+Description
+- dataset 2 info
