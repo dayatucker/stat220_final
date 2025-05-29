@@ -261,17 +261,13 @@ get_album_data <- function(album_ids, token) {
 
 # Collecting track data for a given album via function
 get_album_tracks <- function(album_id, token) {
-  
   url <- paste0("https://api.spotify.com/v1/albums/", album_id, "/tracks")
+  req <- request(url) |>
+    req_headers(Authorization = paste("Bearer", token))
+  resp <- req_perform(req)
+  content <- resp_body_json(resp, simplifyVector = FALSE)
   
-  req <- GET(
-    url,
-    add_headers(Authorization = paste("Bearer", token))
-  )
-  
-  content <- content(req, "parsed", simplifyVector = FALSE)
-  
-  table <- map_dfr(content$items, function(track) {
+  map_dfr(content$items, function(track) {
     tibble(
       album_id = album_id,
       track_id = track$id,
@@ -283,7 +279,6 @@ get_album_tracks <- function(album_id, token) {
     )
   })
 }
-
 
 # For loop for creating album_data, album_track_data, and combined_data for years 2018 to 2024
 
