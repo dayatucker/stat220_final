@@ -160,13 +160,13 @@ artist_ids_2024 <- c(
 
 ```{r}
 # Merge track data with artist names
-  all_tracks_2018 <- merge_artist_data(artist_ids_2018)
-  all_tracks_2019 <- merge_artist_data(artist_ids_2019)
-  all_tracks_2020 <- merge_artist_data(artist_ids_2020)
-  all_tracks_2021 <- merge_artist_data(artist_ids_2021)
-  all_tracks_2022 <- merge_artist_data(artist_ids_2022)
-  all_tracks_2023 <- merge_artist_data(artist_ids_2023)
-  all_tracks_2024 <- merge_artist_data(artist_ids_2024)
+  all_tracks_2018 <- merge_artist_data(artist_ids_2018) |> mutate(year = 2018)
+  all_tracks_2019 <- merge_artist_data(artist_ids_2019) |> mutate(year = 2019)
+  all_tracks_2020 <- merge_artist_data(artist_ids_2020) |> mutate(year = 2020)
+  all_tracks_2021 <- merge_artist_data(artist_ids_2021) |> mutate(year = 2021)
+  all_tracks_2022 <- merge_artist_data(artist_ids_2022) |> mutate(year = 2022)
+  all_tracks_2023 <- merge_artist_data(artist_ids_2023) |> mutate(year = 2023)
+  all_tracks_2024 <- merge_artist_data(artist_ids_2024) |> mutate(year = 2024)
 
 # Combine all years
   combined_tracks <- bind_rows(
