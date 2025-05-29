@@ -98,7 +98,7 @@ all_tracks |>
         y = ~popularity,
         type = 'bar',
         color = ~explicit,
-        colors = c('blue', 'red'),
+        colors = c('#191414', '#1db954'),
         text = ~paste("Track:", track_name,
                       "\nArtist:", artist_name,
                       "\nPopularity:", popularity,
