@@ -1,5 +1,5 @@
 ---
-title: "artists_graphs"
+title: "Main"
 output: html_document
 ---
 
@@ -11,9 +11,6 @@ library(DT)
 library(httr)
 library(stringr)
 ```
-
-
-
 
 # Graph that will include a dropdown menu for the user to select an artist. It will display the artist's top tracks and if the track is explicit or not.
 ```{r}
@@ -91,3 +88,29 @@ top_tracks_duration_plot <- ggplot(
 ggplotly(top_tracks_duration_plot, tooltip = "text")
 ```
 
+## Popularity by Track Name (Color by Explicit)
+
+```{r}
+all_tracks |>
+  filter(artist_name == "Taylor Swift") |>
+  plot_ly(
+        x = ~reorder(track_name, popularity),
+        y = ~popularity,
+        type = 'bar',
+        color = ~explicit,
+        colors = c('blue', 'red'),
+        text = ~paste("Track:", track_name,
+                      "\nArtist:", artist_name,
+                      "\nPopularity:", popularity,
+                      "\nExplicit:", explicit),
+        hoverinfo = "text") |>
+  layout(title = "Top Tracks by Popularity",
+         xaxis = list(title = "Track Name", tickangle = -45),
+         yaxis = list(title = "Popularity"))
+```
+
+## Resources:
+1. Revealed: The Top Artists, Songs, Albums, Podcasts, and Audiobooks of 2024 (https://newsroom.spotify.com/2024-12-04/top-songs-artists-podcasts-audiobooks-albums-trends-2024/)
+
+2. Spotify Web API
+(https://developer.spotify.com/documentation/web-api)

@@ -1,18 +1,11 @@
----
-title: "Spotify Artist Explorer"
-output: html_document
----
-
-```{r setup, include=FALSE}
+# Import datasets
 library(tidyverse)
 library(httr2)
-library(plotly)
-library(DT)
-library(purrr)
 library(httr)
-```
+library(stringr)
 
-```{r}
+
+# API Setup
 client_id <- readLines("spotify_client_id.txt")
 client_secret <- readLines("spotify_client_secret.txt")
 
@@ -27,9 +20,9 @@ get_spotify_token <- function(client_id, client_secret) {
 }
 
 token <- get_spotify_token(client_id, client_secret)
-```
 
-```{r}
+
+# Function to get the artist and other information
 get_artists_data <- function(artist_ids, token) {
   artist_chunks <- split(artist_ids, ceiling(seq_along(artist_ids) / 50))
   
@@ -54,6 +47,8 @@ get_artists_data <- function(artist_ids, token) {
   })
 }
 
+
+# Function to include the top tracks of the artists
 get_artist_top_tracks <- function(artist_id, token) {
   url <- paste0("https://api.spotify.com/v1/artists/", artist_id, "/top-tracks?market=US")
   
@@ -75,7 +70,69 @@ get_artist_top_tracks <- function(artist_id, token) {
   })
 }
 
-artist_ids <- c(
+
+# Function to create multiple datasets by year of the top tracks from top artists
+merge_artist_data <- function(artist_ids){
+  artists_data_temp <- get_artists_data(artist_ids, token)
+  all_tracks_temp <- map_dfr(artist_ids, get_artist_top_tracks, token = token)
+  return(left_join(all_tracks_temp, artists_data_temp |> select(artist_id, artist_name), by = "artist_id"))
+}
+
+# Artist id lists
+artist_ids_2018 <- c(
+  "3TVXtAsR1Inumwj472S9r4", # Drake
+  "246dkjvS1zLTtiykXe5h60", # Post Malone
+  "15UsOTVnJzReFVN1VCnxy4", # XXXTENTACION
+  "1vyhD5VmyZ7KMfW5gqLgo5", # J Balvin
+  "6eUKZXaKkcviH0Ku9w2n3V"  # Ed Sheeran
+)
+
+artist_ids_2019 <- c(
+  "246dkjvS1zLTtiykXe5h60", # Post Malone
+  "6eUKZXaKkcviH0Ku9w2n3V", # Ed Sheeran
+  "6qqNVTkY8uBg9cP3Jd7DAH", # Billie Eilish
+  "66CXWjxzNUsdJxJ2JdwvnR", # Ariana Grande
+  "4q3ewBCX7sLwd24euuV69X"  # Bad Bunny
+)
+
+artist_ids_2020 <- c(
+  "4q3ewBCX7sLwd24euuV69X", # Bad Bunny
+  "3TVXtAsR1Inumwj472S9r4", # Drake
+  "1vyhD5VmyZ7KMfW5gqLgo5", # J Balvin
+  "4MCBfE4596Uoi2O4DtmEMz", # Juice WRLD
+  "1Xyo4u8uXC1ZmMpatF05PJ"  # The Weeknd
+)
+
+artist_ids_2021 <- c(
+  "4q3ewBCX7sLwd24euuV69X",  # Bad Bunny
+  "06HL4z0CvFAxyc27GXpf02",  # Taylor Swift
+  "3Nrfpe0tUJi4K4DXYWgMUX",  # BTS
+  "3TVXtAsR1Inumwj472S9r4",  # Drake
+  "1uNFoZAHBGtllmzznpCI3s"   # Justin Bieber
+)
+
+artist_ids_2022 <- c(
+  "4q3ewBCX7sLwd24euuV69X",  # Bad Bunny
+  "06HL4z0CvFAxyc27GXpf02",  # Taylor Swift
+  "3TVXtAsR1Inumwj472S9r4",  # Drake
+  "1Xyo4u8uXC1ZmMpatF05PJ",  # The Weeknd
+  "3Nrfpe0tUJi4K4DXYWgMUX"   # BTS
+)
+
+artist_ids_2023 <- c(
+  "06HL4z0CvFAxyc27GXpf02",  # Taylor Swift
+  "4q3ewBCX7sLwd24euuV69X",  # Bad Bunny
+  "1Xyo4u8uXC1ZmMpatF05PJ",  # The Weeknd
+  "3TVXtAsR1Inumwj472S9r4",  # Drake
+  "12GqGscKJx3aE4t07u7eVZ",  # Peso Pluma
+  "2LRoIwlKmHjgvigdNGBHNo",  # Feid
+  "0Y5tJX1MQlPlqiwlOH1tJY",  # Travis Scott
+  "7tYKF4w9nC0nq9CsPZTHyP",  # SZA
+  "790FomKkXshlbRYZFtlgla",  # Karol G
+  "00FQb4jTyendYWaN8pK0wa"   # Lana Del Rey
+)
+
+artist_ids_2024 <- c(
   "06HL4z0CvFAxyc27GXpf02",  # Taylor Swift
   "1Xyo4u8uXC1ZmMpatF05PJ",  # The Weeknd
   "4q3ewBCX7sLwd24euuV69X",  # Bad Bunny
@@ -88,29 +145,27 @@ artist_ids <- c(
   "2LRoIwlKmHjgvigdNGBHNo"   # Feid
 )
 
-artists_data <- get_artists_data(artist_ids, token)
-all_tracks <- map_dfr(artist_ids, get_artist_top_tracks, token = token)
 
 # Merge track data with artist names
-all_tracks <- left_join(all_tracks, artists_data |> select(artist_id, artist_name), by = "artist_id")
-```
+all_tracks_2018 <- merge_artist_data(artist_ids_2018) |> mutate(year = 2018)
+all_tracks_2019 <- merge_artist_data(artist_ids_2019) |> mutate(year = 2019)
+all_tracks_2020 <- merge_artist_data(artist_ids_2020) |> mutate(year = 2020)
+all_tracks_2021 <- merge_artist_data(artist_ids_2021) |> mutate(year = 2021)
+all_tracks_2022 <- merge_artist_data(artist_ids_2022) |> mutate(year = 2022)
+all_tracks_2023 <- merge_artist_data(artist_ids_2023) |> mutate(year = 2023)
+all_tracks_2024 <- merge_artist_data(artist_ids_2024) |> mutate(year = 2024)
 
-## Top 10 Most Popular Songs (All Artists)
+# Combine all years
+combined_tracks <- bind_rows(
+  all_tracks_2018,
+  all_tracks_2019,
+  all_tracks_2020,
+  all_tracks_2021,
+  all_tracks_2022,
+  all_tracks_2023,
+  all_tracks_2024
+)
 
-```{r}
-top10_tracks <- all_tracks |> 
-  arrange(desc(popularity))
-
-datatable(top10_tracks |> 
-            select(Track = track_name,
-                   Artist = artist_name,
-                   Popularity = popularity,
-                   Explicit = explicit))
-```
-## NICKS CODE:
-## Top Albums
-
-```{r}
 # Collecting IDs for Top Albums from 2018 to 2024
 
 album_ids_2018 <- c(
@@ -179,9 +234,6 @@ album_ids_2024 <- c(
   "2ODvWsOgouMbaA5xf0RkJe"  # Starboy - The Weeknd  
 )
 
-```
-
-```{r}
 # Collecting album data for a given year via function
 get_album_data <- function(album_ids, token) {
   album_chunks <- split(album_ids, ceiling(seq_along(album_ids) / 50))
@@ -204,9 +256,7 @@ get_album_data <- function(album_ids, token) {
     })
   })
 }
-```
 
-```{r}
 # Collecting track data for a given album via function
 get_album_tracks <- function(album_id, token) {
   
@@ -218,7 +268,7 @@ get_album_tracks <- function(album_id, token) {
   )
   
   content <- content(req, "parsed", simplifyVector = FALSE)
-
+  
   table <- map_dfr(content$items, function(track) {
     tibble(
       album_id = album_id,
@@ -231,9 +281,8 @@ get_album_tracks <- function(album_id, token) {
     )
   })
 }
-```
 
-```{r}
+
 # For loop for creating album_data, album_track_data, and combined_data for years 2018 to 2024
 
 # Define the years
@@ -262,34 +311,16 @@ for (year in years) {
     left_join(get(paste0("album_data_", year)), get(paste0("album_tracks_", year)), by = "album_id")
   )
 }
-```
 
+# Write yearly datasets to CSV files
+write_csv(all_tracks_2018, "data/all_tracks_2018.csv")
+write_csv(all_tracks_2019, "data/all_tracks_2019.csv")
+write_csv(all_tracks_2020, "data/all_tracks_2020.csv")
+write_csv(all_tracks_2021, "data/all_tracks_2021.csv")
+write_csv(all_tracks_2022, "data/all_tracks_2022.csv")
+write_csv(all_tracks_2023, "data/all_tracks_2023.csv")
+write_csv(all_tracks_2024, "data/all_tracks_2024.csv")
 
+# Write the combined dataset to a CSV file
+write_csv(combined_tracks, "data/combined_tracks_2018_2024.csv")
 
-
-## Popularity by Track Name (Color by Explicit)
-
-```{r}
-all_tracks |>
-  filter(artist_name == "Taylor Swift") |>
-  plot_ly(
-        x = ~reorder(track_name, popularity),
-        y = ~popularity,
-        type = 'bar',
-        color = ~explicit,
-        colors = c('blue', 'red'),
-        text = ~paste("Track:", track_name,
-                      "\nArtist:", artist_name,
-                      "\nPopularity:", popularity,
-                      "\nExplicit:", explicit),
-        hoverinfo = "text") |>
-  layout(title = "Top Tracks by Popularity",
-         xaxis = list(title = "Track Name", tickangle = -45),
-         yaxis = list(title = "Popularity"))
-```
-
-## Resources:
-1. Revealed: The Top Artists, Songs, Albums, Podcasts, and Audiobooks of 2024 (https://newsroom.spotify.com/2024-12-04/top-songs-artists-podcasts-audiobooks-albums-trends-2024/)
-
-2. Spotify Web API
-(https://developer.spotify.com/documentation/web-api)
