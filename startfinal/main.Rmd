@@ -36,6 +36,9 @@ artist_tracks_plot <- ggplot(
     )
   )
 ) +
+  scale_fill_manual(
+    values = c("Explicit" = "#1db954", "Non-Explicit" = "#191414")
+  ) +
   geom_col(show.legend = TRUE) +
   theme_minimal() +
   labs(
@@ -49,8 +52,6 @@ artist_tracks_plot <- ggplot(
 # Convert to Plotly
 ggplotly(artist_tracks_plot, tooltip = "text")
 ```
-
-
 
 
 ```{r}
@@ -76,7 +77,7 @@ top_tracks_duration_plot <- ggplot(
     )
   )
 ) +
-  geom_point(color = "orange", size = 4, alpha = 0.8) +
+  geom_point(color = "#1db954", size = 4, alpha = 0.8) +
   theme_minimal() +
   labs(
     title = paste("Popularity vs Duration for", selected_artist),
@@ -88,26 +89,6 @@ top_tracks_duration_plot <- ggplot(
 ggplotly(top_tracks_duration_plot, tooltip = "text")
 ```
 
-## Popularity by Track Name (Color by Explicit)
-
-```{r}
-all_tracks |>
-  filter(artist_name == "Taylor Swift") |>
-  plot_ly(
-        x = ~reorder(track_name, popularity),
-        y = ~popularity,
-        type = 'bar',
-        color = ~explicit,
-        colors = c('#191414', '#1db954'),
-        text = ~paste("Track:", track_name,
-                      "\nArtist:", artist_name,
-                      "\nPopularity:", popularity,
-                      "\nExplicit:", explicit),
-        hoverinfo = "text") |>
-  layout(title = "Top Tracks by Popularity",
-         xaxis = list(title = "Track Name", tickangle = -45),
-         yaxis = list(title = "Popularity"))
-```
 
 ## Resources:
 1. Revealed: The Top Artists, Songs, Albums, Podcasts, and Audiobooks of 2024 (https://newsroom.spotify.com/2024-12-04/top-songs-artists-podcasts-audiobooks-albums-trends-2024/)
