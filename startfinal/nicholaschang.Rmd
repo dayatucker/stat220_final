@@ -200,7 +200,9 @@ get_album_data <- function(album_ids, token) {
         album_id = album$id,
         album_name = album$name,
         album_release_date = album$release_date,
-        album_artists = paste(map_chr(album$artists, ~ .x$name), collapse = ", ") 
+        album_popularity = album$popularity,
+        album_artists = paste(map_chr(album$artists, ~ .x$name), collapse = ", "),
+        album_total_tracks = album$total_tracks
       )
     })
   })
@@ -282,6 +284,27 @@ combined_album_all <- bind_rows(
   combined_2024
 )
 ```
+
+```{r}
+combined_album_all %>% 
+  filter(charted_year == 2023) %>% 
+  select(album_id, album_name, album_popularity, album_total_tracks) %>% 
+  distinct() %>% 
+  ggplot() + 
+  geom_col(aes(x = factor(album_name, levels = unique(album_name)), y = album_popularity)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Top Albums of 2023",
+    y = "Popularity Score",
+    x = "Album Name"
+  )
+```
+
+```{r}
+
+```
+
 
 
 
