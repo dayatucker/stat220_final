@@ -50,7 +50,7 @@ get_artists_data <- function(artist_ids, token) {
 
 # Function to include the top tracks of the artists
 get_artist_top_tracks <- function(artist_id, token) {
-  url <- str_c("https://api.spotify.com/v1/artists/", artist_id, "/top-tracks?market=US")
+  url <- paste0("https://api.spotify.com/v1/artists/", artist_id, "/top-tracks?market=US")
   
   req <- request(url) |>
     req_headers(Authorization = paste("Bearer", token))
@@ -155,8 +155,8 @@ all_tracks_2022 <- merge_artist_data(artist_ids_2022) |> mutate(year = 2022)
 all_tracks_2023 <- merge_artist_data(artist_ids_2023) |> mutate(year = 2023)
 all_tracks_2024 <- merge_artist_data(artist_ids_2024) |> mutate(year = 2024)
 
-# Combine all years
-combined_tracks <- bind_rows(
+# Combine all years (artists data)
+combined_artists_tracks <- bind_rows(
   all_tracks_2018,
   all_tracks_2019,
   all_tracks_2020,
@@ -251,7 +251,9 @@ get_album_data <- function(album_ids, token) {
         album_id = album$id,
         album_name = album$name,
         album_release_date = album$release_date,
-        album_artists = paste(map_chr(album$artists, ~ .x$name), collapse = ", ") 
+        album_artists = paste(map_chr(album$artists, "name"), collapse = ", "),
+        total_tracks = album$total_tracks,
+        album_url = album$external_urls$spotify
       )
     })
   })
@@ -259,17 +261,13 @@ get_album_data <- function(album_ids, token) {
 
 # Collecting track data for a given album via function
 get_album_tracks <- function(album_id, token) {
+  url <- paste0("https://api.spotify.com/v1/albums/", album_id, "/tracks")
+  req <- request(url) |>
+    req_headers(Authorization = paste("Bearer", token))
+  resp <- req_perform(req)
+  content <- resp_body_json(resp, simplifyVector = FALSE)
   
-  url <- str_c("https://api.spotify.com/v1/albums/", album_id, "/tracks")
-  
-  req <- GET(
-    url,
-    add_headers(Authorization = paste("Bearer", token))
-  )
-  
-  content <- content(req, "parsed", simplifyVector = FALSE)
-  
-  table <- map_dfr(content$items, function(track) {
+  map_dfr(content$items, function(track) {
     tibble(
       album_id = album_id,
       track_id = track$id,
@@ -282,7 +280,6 @@ get_album_tracks <- function(album_id, token) {
   })
 }
 
-
 # For loop for creating album_data, album_track_data, and combined_data for years 2018 to 2024
 
 # Define the years
@@ -291,28 +288,39 @@ years <- 2018:2024
 # Loop through each year to create album_data_YYYY and album_tracks_YYYY
 for (year in years) {
   # Get the album_ids for the current year
-  album_ids <- get(str_c("album_ids_", year))
+  album_ids <- get(paste0("album_ids_", year))
   
   # Create album_data_YYYY
   assign(
-    str_c("album_data_", year),
+    paste0("album_data_", year),
     get_album_data(album_ids, token)
   )
   
   # Create album_tracks_YYYY
   assign(
-    str_c("album_tracks_", year),
+    paste0("album_tracks_", year),
     map_dfr(album_ids, get_album_tracks, token = token)
   )
   
   # Create combined_YYY
   assign(
-    str_c("combined_", year), 
-    left_join(get(str_c("album_data_", year)), get(str_c("album_tracks_", year)), by = "album_id")
+    paste0("combined_", year), 
+    left_join(get(paste0("album_data_", year)), get(paste0("album_tracks_", year)), by = "album_id")
   )
 }
 
-# Write yearly datasets to CSV files
+# # Combine all years (albums data)
+combined_albums_tracks <- bind_rows(
+  combined_2018,
+  combined_2019,
+  combined_2020,
+  combined_2021,
+  combined_2022,
+  combined_2023,
+  combined_2024
+)
+
+# Write yearly datasets of artists to CSV files
 write_csv(all_tracks_2018, "data/all_tracks_2018.csv")
 write_csv(all_tracks_2019, "data/all_tracks_2019.csv")
 write_csv(all_tracks_2020, "data/all_tracks_2020.csv")
@@ -321,6 +329,10 @@ write_csv(all_tracks_2022, "data/all_tracks_2022.csv")
 write_csv(all_tracks_2023, "data/all_tracks_2023.csv")
 write_csv(all_tracks_2024, "data/all_tracks_2024.csv")
 
-# Write the combined dataset to a CSV file
-write_csv(combined_tracks, "data/combined_tracks_2018_2024.csv")
+# Write the combined dataset for artists to a CSV file
+write_csv(combined_artists_tracks, "data/combined_artists_tracks_2018_2024.csv")
+
+# Write combined dataset for albums to a CSV
+write_csv(combined_albums_tracks, "data/combined_albums_tracks_2018_2024.csv")
+
 
