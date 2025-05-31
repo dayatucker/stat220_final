@@ -75,7 +75,13 @@ get_artist_top_tracks <- function(artist_id, token) {
 merge_artist_data <- function(artist_ids){
   artists_data_temp <- get_artists_data(artist_ids, token)
   all_tracks_temp <- map_dfr(artist_ids, get_artist_top_tracks, token = token)
-  return(left_join(all_tracks_temp, artists_data_temp |> select(artist_id, artist_name), by = "artist_id"))
+  return(
+    left_join(
+      all_tracks_temp,
+      artists_data_temp %>% select(artist_id, artist_name, genres),
+      by = "artist_id"
+    )
+  )
 }
 
 # Artist id lists
@@ -236,7 +242,7 @@ album_ids_2024 <- c(
 
 # Collecting album data for a given year via function
 get_album_data <- function(album_ids, token) {
-  album_chunks <- split(album_ids, ceiling(seq_along(album_ids) / 50))
+  album_chunks <- split(album_ids, ceiling(seq_along(album_ids) / 20))
   
   map_dfr(album_chunks, function(ids_chunk) {
     req <- request("https://api.spotify.com/v1/albums") |>
@@ -250,10 +256,13 @@ get_album_data <- function(album_ids, token) {
       tibble(
         album_id = album$id,
         album_name = album$name,
-        album_release_date = album$release_date,
-        album_artists = paste(map_chr(album$artists, "name"), collapse = ", "),
+        artist_name = album$artists[[1]]$name,
+        artist_id = album$artists[[1]]$id,
+        release_date = album$release_date,
         total_tracks = album$total_tracks,
-        album_url = album$external_urls$spotify
+        label = album$label,
+        album_url = album$external_urls$spotify,
+        album_popularity = album$popularity
       )
     })
   })
@@ -332,7 +341,7 @@ write_csv(all_tracks_2024, "data/all_tracks_2024.csv")
 # Write the combined dataset for artists to a CSV file
 write_csv(combined_artists_tracks, "data/combined_artists_tracks_2018_2024.csv")
 
-# Write combined dataset for albums to a CSV
+# Write combined dataset for albums to a CSV file
 write_csv(combined_albums_tracks, "data/combined_albums_tracks_2018_2024.csv")
 
 

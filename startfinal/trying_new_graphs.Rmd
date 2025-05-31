@@ -1,0 +1,62 @@
+---
+title: "trying_new_graphs"
+output: html_document
+---
+
+```{r}
+library(tidytext)
+library(dplyr)
+library(ggplot2)
+library(plotly)
+library(scales)
+```
+
+```{r}
+# Ranked list of the most meaningful and common words from all album titles
+track_sentiments <- combined_albums_tracks |>
+  unnest_tokens(word, track_name) |>
+  anti_join(stop_words) |>
+  inner_join(get_sentiments("bing")) |> 
+  count(word, sentiment, sort = TRUE)
+
+p <- track_sentiments |>
+  group_by(sentiment) |>
+  top_n(10, n) |>
+  ungroup() |>
+  mutate(word = reorder(word, n)) |>
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  coord_flip() +
+  labs(title = "Most Common Positive and Negative Words in Track Titles",
+       x = NULL, y = "Word Frequency")
+
+ggplotly(p)
+```
+
+# Time Data
+```{r}
+albums %>%
+  mutate(release_year = lubridate::year(release_date)) %>%
+  group_by(release_year) %>%
+  summarise(mean_popularity = mean(album_popularity, na.rm = TRUE))
+```
+
+# Visualize genres over time with example genre: 
+```{r}
+# Step 1: Break genres into individual rows
+long_genres <- combined_artists_tracks %>%
+  separate_rows(genres, sep = ", ")
+
+# Step 2: Filter for a specific genre (e.g., "reggaeton")
+reggaeton_tracks <- long_genres %>%
+  filter(genres == "reggaeton")
+
+# Step 3: Count number of reggaeton tracks per year
+reggaeton_yearly_counts <- reggaeton_tracks %>%
+  count(year) %>%
+  rename(count = n)
+
+```
+
+
