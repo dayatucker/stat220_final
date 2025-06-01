@@ -59,13 +59,16 @@ get_artist_top_tracks <- function(artist_id, token) {
   content <- resp_body_json(resp, simplifyVector = FALSE)
   
   map_dfr(content$tracks, function(track) {
+    release_date <- track$album$release_date
+    release_year <- as.numeric(substr(release_date, 1, 4))
     tibble(
       track_name = track$name,
       album_name = track$album$name,
       popularity = track$popularity,
       track_duration_ms = track$duration_ms,
       explicit = track$explicit,
-      artist_id = artist_id
+      artist_id = artist_id,
+      release_year = release_year
     )
   })
 }
@@ -75,14 +78,13 @@ get_artist_top_tracks <- function(artist_id, token) {
 merge_artist_data <- function(artist_ids){
   artists_data_temp <- get_artists_data(artist_ids, token)
   all_tracks_temp <- map_dfr(artist_ids, get_artist_top_tracks, token = token)
-  return(
-    left_join(
-      all_tracks_temp,
-      artists_data_temp %>% select(artist_id, artist_name, genres),
-      by = "artist_id"
-    )
+  left_join(
+    all_tracks_temp,
+    artists_data_temp %>% select(artist_id, artist_name, genres),
+    by = "artist_id"
   )
 }
+
 
 # Artist id lists
 artist_ids_2018 <- c(
@@ -153,13 +155,14 @@ artist_ids_2024 <- c(
 
 
 # Merge track data with artist names
-all_tracks_2018 <- merge_artist_data(artist_ids_2018) |> mutate(year = 2018)
-all_tracks_2019 <- merge_artist_data(artist_ids_2019) |> mutate(year = 2019)
-all_tracks_2020 <- merge_artist_data(artist_ids_2020) |> mutate(year = 2020)
-all_tracks_2021 <- merge_artist_data(artist_ids_2021) |> mutate(year = 2021)
-all_tracks_2022 <- merge_artist_data(artist_ids_2022) |> mutate(year = 2022)
-all_tracks_2023 <- merge_artist_data(artist_ids_2023) |> mutate(year = 2023)
-all_tracks_2024 <- merge_artist_data(artist_ids_2024) |> mutate(year = 2024)
+all_tracks_2018 <- merge_artist_data(artist_ids_2018) |> mutate(charted_year = 2018)
+all_tracks_2019 <- merge_artist_data(artist_ids_2019) |> mutate(charted_year = 2019)
+all_tracks_2020 <- merge_artist_data(artist_ids_2020) |> mutate(charted_year = 2020)
+all_tracks_2021 <- merge_artist_data(artist_ids_2021) |> mutate(charted_year = 2021)
+all_tracks_2022 <- merge_artist_data(artist_ids_2022) |> mutate(charted_year = 2022)
+all_tracks_2023 <- merge_artist_data(artist_ids_2023) |> mutate(charted_year = 2023)
+all_tracks_2024 <- merge_artist_data(artist_ids_2024) |> mutate(charted_year = 2024)
+
 
 # Combine all years (artists data)
 combined_artists_tracks <- bind_rows(
@@ -172,8 +175,8 @@ combined_artists_tracks <- bind_rows(
   all_tracks_2024
 )
 
-# Collecting IDs for Top Albums from 2018 to 2024
 
+# Collecting IDs for Top Albums from 2018 to 2024
 album_ids_2018 <- c(
   "1ATL5GLyefJaxhQzSPVrLX", # Scorpion - Drake
   "6trNtQUgC8cgbWcqoMYkOR", # beerbons & bentleys - Post Malone
@@ -240,6 +243,7 @@ album_ids_2024 <- c(
   "2ODvWsOgouMbaA5xf0RkJe"  # Starboy - The Weeknd  
 )
 
+
 # Collecting album data for a given year via function
 get_album_data <- function(album_ids, token) {
   album_chunks <- split(album_ids, ceiling(seq_along(album_ids) / 20))
@@ -268,6 +272,7 @@ get_album_data <- function(album_ids, token) {
   })
 }
 
+
 # Collecting track data for a given album via function
 get_album_tracks <- function(album_id, token) {
   url <- paste0("https://api.spotify.com/v1/albums/", album_id, "/tracks")
@@ -288,6 +293,7 @@ get_album_tracks <- function(album_id, token) {
     )
   })
 }
+
 
 # For loop for creating album_data, album_track_data, and combined_data for years 2018 to 2024
 
@@ -316,13 +322,8 @@ for (year in years) {
     paste0("combined_", year), 
     left_join(get(paste0("album_data_", year)), get(paste0("album_tracks_", year)), by = "album_id")
   )
-  
-  # Add charted_year column to combined_YYYY
-  assign(
-    str_c("combined_", year),
-    get(str_c("combined_", year)) %>% mutate(charted_year = year)
-  )
 }
+
 
 # # Combine all years (albums data)
 combined_albums_tracks <- bind_rows(
@@ -335,17 +336,19 @@ combined_albums_tracks <- bind_rows(
   combined_2024
 )
 
-# Write yearly datasets of artists to CSV files
-write_csv(all_tracks_2018, "data/all_tracks_2018.csv")
-write_csv(all_tracks_2019, "data/all_tracks_2019.csv")
-write_csv(all_tracks_2020, "data/all_tracks_2020.csv")
-write_csv(all_tracks_2021, "data/all_tracks_2021.csv")
-write_csv(all_tracks_2022, "data/all_tracks_2022.csv")
-write_csv(all_tracks_2023, "data/all_tracks_2023.csv")
-write_csv(all_tracks_2024, "data/all_tracks_2024.csv")
+
+# # Write yearly datasets of artists to CSV files
+# write_csv(all_tracks_2018, "data/all_tracks_2018.csv")
+# write_csv(all_tracks_2019, "data/all_tracks_2019.csv")
+# write_csv(all_tracks_2020, "data/all_tracks_2020.csv")
+# write_csv(all_tracks_2021, "data/all_tracks_2021.csv")
+# write_csv(all_tracks_2022, "data/all_tracks_2022.csv")
+# write_csv(all_tracks_2023, "data/all_tracks_2023.csv")
+# write_csv(all_tracks_2024, "data/all_tracks_2024.csv")
 
 # Write the combined dataset for artists to a CSV file
 write_csv(combined_artists_tracks, "data/combined_artists_tracks_2018_2024.csv")
+
 
 # Write combined dataset for albums to a CSV file
 write_csv(combined_albums_tracks, "data/combined_albums_tracks_2018_2024.csv")
