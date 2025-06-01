@@ -304,36 +304,35 @@ years <- 2018:2024
 for (year in years) {
   # Get the album_ids for the current year
   album_ids <- get(paste0("album_ids_", year))
-  
+
   # Create album_data_YYYY
   assign(
     paste0("album_data_", year),
     get_album_data(album_ids, token)
   )
-  
+
   # Create album_tracks_YYYY
   assign(
     paste0("album_tracks_", year),
     map_dfr(album_ids, get_album_tracks, token = token)
   )
-  
+
   # Create combined_YYYY by joining album_data and album_tracks
   combined_df <- left_join(
     get(paste0("album_data_", year)),
     get(paste0("album_tracks_", year)),
     by = "album_id"
   )
-  
+
   # Add charted_year by extracting year from release_date
   combined_df <- combined_df %>%
     mutate(charted_year = as.integer(substr(release_date, 1, 4)))
-  
+
   # Assign combined_YYYY with the new column back to environment
   assign(paste0("combined_", year), combined_df)
 }
 
-
-# # Combine all years (albums data)
+# Combine all years (albums data)
 combined_albums_tracks <- bind_rows(
   combined_2018,
   combined_2019,
@@ -343,6 +342,82 @@ combined_albums_tracks <- bind_rows(
   combined_2023,
   combined_2024
 )
+
+# Get a page of new releases (max 50 at once)
+get_new_releases <- function(token, country = "US", limit = 50, offset = 0) {
+  url <- "https://api.spotify.com/v1/browse/new-releases"
+  
+  req <- request(url) |>
+    req_url_query(country = country, limit = limit, offset = offset) |>
+    req_headers(Authorization = paste("Bearer", token))
+  
+  resp <- req_perform(req)
+  content <- resp_body_json(resp, simplifyVector = FALSE)
+  
+  map_dfr(content$albums$items, function(album) {
+    tibble(
+      album_id = album$id,
+      album_name = album$name,
+      artist_name = paste(map_chr(album$artists, "name"), collapse = ", "),
+      release_date = album$release_date,
+      total_tracks = album$total_tracks,
+      album_type = album$album_type,
+      album_url = album$external_urls$spotify
+    )
+  })
+}
+
+# Get multiple pages of new releases
+get_all_new_releases <- function(token, country = "US", max_albums = 100) {
+  pages <- ceiling(max_albums / 50)
+  map_dfr(seq_len(pages), function(i) {
+    offset <- (i - 1) * 50
+    get_new_releases(token, country = country, limit = 50, offset = offset)
+  }) |> head(max_albums)
+}
+
+# ---- MAIN LOOP FOR HISTORICAL YEARS ----
+
+years <- 2018:2024
+
+for (year in years) {
+  album_ids <- get(paste0("album_ids_", year))
+  
+  assign(paste0("album_data_", year), get_album_data(album_ids, token))
+  
+  assign(paste0("album_tracks_", year),
+         map_dfr(album_ids, get_album_tracks, token = token))
+  
+  combined_df <- left_join(
+    get(paste0("album_data_", year)),
+    get(paste0("album_tracks_", year)),
+    by = "album_id"
+  )
+  
+  combined_df <- combined_df %>%
+    mutate(charted_year = as.integer(substr(release_date, 1, 4)))
+  
+  assign(paste0("combined_", year), combined_df)
+}
+
+# ---- NEW RELEASES WORKFLOW ----
+
+# 1. Get latest new releases
+new_releases <- get_all_new_releases(token, max_albums = 100)
+
+# 2. Get detailed album info
+new_album_data <- get_album_data(new_releases$album_id, token)
+
+# 3. Get track data from albums
+new_album_tracks <- map_dfr(new_releases$album_id, get_album_tracks, token = token)
+
+# 4. Merge album + track + new release metadata
+new_releases_combined <- new_album_tracks |>
+  left_join(new_album_data %>% select(album_id, release_date, total_tracks, popularity, album_type), 
+            by = "album_id") |>
+  left_join(new_releases %>% select(album_id, album_name, artist_name, album_url), 
+            by = "album_id") |>
+  mutate(charted_year = as.integer(substr(release_date, 1, 4)))
 
 
 # # Write yearly datasets of artists to CSV files
@@ -361,4 +436,6 @@ write_csv(combined_artists_tracks, "data/combined_artists_tracks_2018_2024.csv")
 # Write combined dataset for albums to a CSV file
 write_csv(combined_albums_tracks, "data/combined_albums_tracks_2018_2024.csv")
 
+# Write new releases dataset (most updated from Spotify)
+write_csv(new_releases_combined, "data/new_releases_combined.csv")
 
