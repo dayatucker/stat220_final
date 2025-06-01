@@ -343,7 +343,7 @@ combined_albums_tracks <- bind_rows(
   combined_2024
 )
 
-# Get a page of new releases (max 50 at once)
+# Get a page of new releases
 get_new_releases <- function(token, country = "US", limit = 50, offset = 0) {
   url <- "https://api.spotify.com/v1/browse/new-releases"
   
@@ -376,8 +376,6 @@ get_all_new_releases <- function(token, country = "US", max_albums = 100) {
   }) |> head(max_albums)
 }
 
-# ---- MAIN LOOP FOR HISTORICAL YEARS ----
-
 years <- 2018:2024
 
 for (year in years) {
@@ -400,18 +398,17 @@ for (year in years) {
   assign(paste0("combined_", year), combined_df)
 }
 
-# ---- NEW RELEASES WORKFLOW ----
 
-# 1. Get latest new releases
+# Get latest new releases
 new_releases <- get_all_new_releases(token, max_albums = 100)
 
-# 2. Get detailed album info
+# Get detailed album info
 new_album_data <- get_album_data(new_releases$album_id, token)
 
-# 3. Get track data from albums
+# Get track data from albums
 new_album_tracks <- map_dfr(new_releases$album_id, get_album_tracks, token = token)
 
-# 4. Merge album + track + new release metadata
+# Merge album + track + new release metadata
 new_releases_combined <- new_album_tracks |>
   left_join(new_album_data %>% select(album_id, release_date, total_tracks, popularity, album_type), 
             by = "album_id") |>
