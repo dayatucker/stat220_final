@@ -316,6 +316,12 @@ for (year in years) {
     paste0("combined_", year), 
     left_join(get(paste0("album_data_", year)), get(paste0("album_tracks_", year)), by = "album_id")
   )
+  
+  # Add charted_year column to combined_YYYY
+  assign(
+    str_c("combined_", year),
+    get(str_c("combined_", year)) %>% mutate(charted_year = year)
+  )
 }
 
 # # Combine all years (albums data)
