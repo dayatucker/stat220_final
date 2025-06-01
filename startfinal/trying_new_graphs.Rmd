@@ -34,29 +34,84 @@ p <- track_sentiments |>
 ggplotly(p)
 ```
 
-# Time Data
-```{r}
-albums %>%
-  mutate(release_year = lubridate::year(release_date)) %>%
-  group_by(release_year) %>%
-  summarise(mean_popularity = mean(album_popularity, na.rm = TRUE))
-```
 
-# Visualize genres over time with example genre: 
 ```{r}
-# Step 1: Break genres into individual rows
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+
+# Example genre input
+selected_genre <- "pop"
+
+# Step 1: Separate genres into individual rows
 long_genres <- combined_artists_tracks %>%
   separate_rows(genres, sep = ", ")
 
-# Step 2: Filter for a specific genre (e.g., "reggaeton")
-reggaeton_tracks <- long_genres %>%
-  filter(genres == "reggaeton")
+# Filter tracks for genres that contain the selected keyword
+genre_tracks <- long_genres %>%
+  filter(grepl(selected_genre, genres, ignore.case = TRUE))
 
-# Step 3: Count number of reggaeton tracks per year
-reggaeton_yearly_counts <- reggaeton_tracks %>%
-  count(year) %>%
-  rename(count = n)
+track_level_df <- genre_tracks %>%
+  distinct(charted_year, genres, track_name, artist_name)
 
+p <- ggplot(track_level_df, aes(x = charted_year, y = genres,
+                                text = paste0(
+                                  "Track: ", track_name,
+                                  "\nArtist: ", artist_name,
+                                  "\nGenre: ", genres,
+                                  "\nCharted Year: ", charted_year))) +
+  geom_jitter(width = 0.2, height = 0.2, color = "#1DB954", alpha = 0.7, size = 3) +
+  labs(
+    title = paste0("Tracks with '", selected_genre, "' Genres (2018–2024)"),
+    x = "Charted Year",
+    y = "Genre"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.background = element_rect(fill = "black"),
+    panel.background = element_rect(fill = "black"),
+    panel.grid.major = element_line(color = "gray30"),
+    panel.grid.minor = element_line(color = "gray20"),
+    plot.title = element_text(face = "bold", color = "white"),
+    axis.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    axis.ticks = element_line(color = "white")
+  )
+
+ggplotly(p, tooltip = "text")
 ```
+
+
+
+# Compare years since release by artist
+```{r}
+p <- combined_artists_tracks |>
+  filter(artist_name == "Taylor Swift") |>
+  ggplot(aes(
+    x = years_since_release,
+    y = popularity,
+    color = track_name,
+    text = paste(
+      "Track: ", track_name,
+      "<br>Popularity: ", popularity,
+      "<br>Years Since Release: ", years_since_release,
+      "<br>Charted Year: ", charted_year,
+      "<br>Release Year: ", release_year
+    )
+  )) +
+  geom_point(size = 3, alpha = 0.7) +
+  labs(
+    title = "Taylor Swift: Track Popularity vs. Years Since Release",
+    x = "Years Since Release",
+    y = "Popularity",
+    color = "Track Name"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggplotly(p, tooltip = "text")
+```
+
 
 

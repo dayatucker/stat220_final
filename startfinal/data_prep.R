@@ -75,14 +75,17 @@ get_artist_top_tracks <- function(artist_id, token) {
 
 
 # Function to create multiple datasets by year of the top tracks from top artists
-merge_artist_data <- function(artist_ids){
+merge_artist_data <- function(artist_ids, charted_year){
   artists_data_temp <- get_artists_data(artist_ids, token)
   all_tracks_temp <- map_dfr(artist_ids, get_artist_top_tracks, token = token)
-  left_join(
-    all_tracks_temp,
-    artists_data_temp %>% select(artist_id, artist_name, genres),
-    by = "artist_id"
-  )
+  all_tracks_temp <- all_tracks_temp |>
+    left_join(artists_data_temp %>% select(artist_id, artist_name, genres),
+              by = "artist_id") |>
+    mutate(
+      charted_year = charted_year,
+      years_since_release = abs(charted_year - release_year)
+    )
+  return(all_tracks_temp)
 }
 
 
@@ -155,13 +158,13 @@ artist_ids_2024 <- c(
 
 
 # Merge track data with artist names
-all_tracks_2018 <- merge_artist_data(artist_ids_2018) |> mutate(charted_year = 2018)
-all_tracks_2019 <- merge_artist_data(artist_ids_2019) |> mutate(charted_year = 2019)
-all_tracks_2020 <- merge_artist_data(artist_ids_2020) |> mutate(charted_year = 2020)
-all_tracks_2021 <- merge_artist_data(artist_ids_2021) |> mutate(charted_year = 2021)
-all_tracks_2022 <- merge_artist_data(artist_ids_2022) |> mutate(charted_year = 2022)
-all_tracks_2023 <- merge_artist_data(artist_ids_2023) |> mutate(charted_year = 2023)
-all_tracks_2024 <- merge_artist_data(artist_ids_2024) |> mutate(charted_year = 2024)
+all_tracks_2018 <- merge_artist_data(artist_ids_2018, 2018)
+all_tracks_2019 <- merge_artist_data(artist_ids_2019, 2019)
+all_tracks_2020 <- merge_artist_data(artist_ids_2020, 2020)
+all_tracks_2021 <- merge_artist_data(artist_ids_2021, 2021)
+all_tracks_2022 <- merge_artist_data(artist_ids_2022, 2022)
+all_tracks_2023 <- merge_artist_data(artist_ids_2023, 2023)
+all_tracks_2024 <- merge_artist_data(artist_ids_2024, 2024)
 
 
 # Combine all years (artists data)
