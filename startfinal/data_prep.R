@@ -263,13 +263,10 @@ get_album_data <- function(album_ids, token) {
       tibble(
         album_id = album$id,
         album_name = album$name,
-        artist_name = album$artists[[1]]$name,
-        artist_id = album$artists[[1]]$id,
         release_date = album$release_date,
         total_tracks = album$total_tracks,
-        label = album$label,
-        album_url = album$external_urls$spotify,
-        album_popularity = album$popularity
+        popularity = album$popularity,
+        album_type = album$album_type
       )
     })
   })
@@ -303,7 +300,7 @@ get_album_tracks <- function(album_id, token) {
 # Define the years
 years <- 2018:2024
 
-# Loop through each year to create album_data_YYYY and album_tracks_YYYY
+# Loop through each year to create album_data_YYYY, album_tracks_YYYY, combined_YYYY, and add charted_year
 for (year in years) {
   # Get the album_ids for the current year
   album_ids <- get(paste0("album_ids_", year))
@@ -320,11 +317,19 @@ for (year in years) {
     map_dfr(album_ids, get_album_tracks, token = token)
   )
   
-  # Create combined_YYY
-  assign(
-    paste0("combined_", year), 
-    left_join(get(paste0("album_data_", year)), get(paste0("album_tracks_", year)), by = "album_id")
+  # Create combined_YYYY by joining album_data and album_tracks
+  combined_df <- left_join(
+    get(paste0("album_data_", year)),
+    get(paste0("album_tracks_", year)),
+    by = "album_id"
   )
+  
+  # Add charted_year by extracting year from release_date
+  combined_df <- combined_df %>%
+    mutate(charted_year = as.integer(substr(release_date, 1, 4)))
+  
+  # Assign combined_YYYY with the new column back to environment
+  assign(paste0("combined_", year), combined_df)
 }
 
 
