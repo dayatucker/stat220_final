@@ -13,7 +13,11 @@ combined_artists_tracks <- combined_artists_tracks %>%
 
 # UI ----
 ui <- fluidPage(
-  titlePanel("Spotify Music Explorer"),
+  titlePanel("Spotify Music Explorer 2018-2024"),
+  
+  # Random Song Spotlight Section
+  h2("🎵 Random Song Spotlight"),
+  uiOutput("song_spotlight"),
   
   tabsetPanel(
     # Top Artists/Albums Tab
@@ -165,6 +169,21 @@ ui <- fluidPage(
 
 # Server ----
 server <- function(input, output, session) {
+  # Pick a random song when the app loads
+  output$song_spotlight <- renderUI({
+    if (nrow(combined_artists_tracks) == 0) return(NULL)
+    
+    spotlight_song <- combined_artists_tracks[sample(nrow(combined_artists_tracks), 1), ]
+    
+    tagList(
+      h3(spotlight_song$track_name),
+      h4(paste("By:", spotlight_song$artist_name)),
+      p(paste("Year:", spotlight_song$charted_year)),
+      p(paste("Genre(s):", spotlight_song$genres)),
+      p(paste("Popularity:", spotlight_song$popularity))
+    )
+  })
+  
   # Top Artists/Albums Logic
   filtered_artists <- reactive({
     combined_artists_tracks %>%
