@@ -5,7 +5,7 @@ library(httr)
 library(stringr)
 
 
-# API Setup
+# API Setup + Token
 client_id <- readLines("spotify_client_id.txt")
 client_secret <- readLines("spotify_client_secret.txt")
 
