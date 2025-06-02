@@ -297,42 +297,39 @@ get_album_tracks <- function(album_id, token) {
 
 # For loop for creating album_data, album_track_data, and combined_data for years 2018 to 2024
 
-# Define the years
+# Loop through each year to create album_data_YYYY, album_tracks_YYYY, combined_YYYY, and add charted_year
 years <- 2018:2024
 
-# Loop through each year to create album_data_YYYY, album_tracks_YYYY, combined_YYYY, and add charted_year
+# Loop through each year to create album_data_YYYY and album_tracks_YYYY
 for (year in years) {
   # Get the album_ids for the current year
-  album_ids <- get(paste0("album_ids_", year))
-
+  album_ids <- get(str_c("album_ids_", year))
+  
   # Create album_data_YYYY
   assign(
-    paste0("album_data_", year),
+    str_c("album_data_", year),
     get_album_data(album_ids, token)
   )
-
+  
   # Create album_tracks_YYYY
   assign(
-    paste0("album_tracks_", year),
+    str_c("album_tracks_", year),
     map_dfr(album_ids, get_album_tracks, token = token)
   )
-
-  # Create combined_YYYY by joining album_data and album_tracks
-  combined_df <- left_join(
-    get(paste0("album_data_", year)),
-    get(paste0("album_tracks_", year)),
-    by = "album_id"
+  
+  # Create combined_YYY
+  assign(
+    str_c("combined_", year), 
+    left_join(get(str_c("album_data_", year)), get(str_c("album_tracks_", year)), by = "album_id")
   )
-
-  # Add charted_year by extracting year from release_date
-  combined_df <- combined_df %>%
-    mutate(charted_year = as.integer(substr(release_date, 1, 4)))
-
-  # Assign combined_YYYY with the new column back to environment
-  assign(paste0("combined_", year), combined_df)
+  
+  # Add charted_year column to combined_YYYY
+  assign(
+    str_c("combined_", year),
+    get(str_c("combined_", year)) %>% mutate(charted_year = year)
+  )
 }
 
-# Combine all years (albums data)
 combined_albums_tracks <- bind_rows(
   combined_2018,
   combined_2019,
@@ -342,6 +339,11 @@ combined_albums_tracks <- bind_rows(
   combined_2023,
   combined_2024
 )
+
+# Column for number of features on a song
+combined_albums_tracks <- combined_albums_tracks %>%
+  mutate(features = str_count(track_artists, ","))
+
 
 # Get a page of new releases
 get_new_releases <- function(token, country = "US", limit = 50, offset = 0) {
