@@ -180,8 +180,11 @@ server <- function(input, output, session) {
       h4(str_c("By:", spotlight_song$artist_name)),
       p(str_c("Year:", spotlight_song$charted_year)),
       p(str_c("Genre(s):", spotlight_song$genres)),
-      p(str_c("Popularity:", spotlight_song$popularity))
+      p(str_c("Popularity:", spotlight_song$popularity)),
+      
+      link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator")
     )
+  
   })
   
   # Top Artists/Albums Logic

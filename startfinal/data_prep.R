@@ -63,6 +63,7 @@ get_artist_top_tracks <- function(artist_id, token) {
     release_year <- as.numeric(substr(release_date, 1, 4))
     tibble(
       track_name = track$name,
+      track_id = track$id,
       album_name = track$album$name,
       popularity = track$popularity,
       track_duration_ms = track$duration_ms,
