@@ -171,20 +171,28 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   # Pick a random song when the app loads
   output$song_spotlight <- renderUI({
-    if (nrow(combined_artists_tracks) == 0) return(NULL)
     
     spotlight_song <- combined_artists_tracks[sample(nrow(combined_artists_tracks), 1), ]
     
+    print(spotlight_song)
+    
+    link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator")
+    
     tagList(
-      h4(spotlight_song$track_name),
-      h4(str_c("By:", spotlight_song$artist_name)),
-      p(str_c("Year:", spotlight_song$charted_year)),
-      p(str_c("Genre(s):", spotlight_song$genres)),
-      p(str_c("Popularity:", spotlight_song$popularity)),
-      
-      link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator")
+      tags$iframe(src=link, 
+                  width="100%", 
+                  height="152", 
+                  frameBorder="0", 
+                  allowfullscreen="", 
+                  allow="autoplay; 
+              clipboard-write; 
+              encrypted-media; 
+              fullscreen; 
+              picture-in-picture", 
+                  loading="lazy"),
+      p(str_c("Year Released: ", as.integer(spotlight_song$release_year))),
+      p(str_c("Popularity: ", spotlight_song$popularity)),
     )
-  
   })
   
   # Top Artists/Albums Logic
