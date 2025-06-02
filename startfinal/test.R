@@ -4,9 +4,9 @@ library(DT)
 library(plotly)
 
 # Load Data ----
-combined_artists_tracks <- read_csv("~/stat 220/stat220_final/startfinal/data/combined_artists_tracks_2018_2024.csv")
-combined_albums_tracks <- read_csv("~/stat 220/stat220_final/startfinal/data/combined_albums_tracks_2018_2024.csv")
-new_releases_combined <- read_csv("~/stat 220/stat220_final/startfinal/data/new_releases_combined.csv")
+combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv")
+combined_albums_tracks <- read_csv("data/combined_albums_tracks_2018_2024.csv")
+new_releases_combined <- read_csv("data/new_releases_combined.csv")
 
 combined_artists_tracks <- combined_artists_tracks %>%
   mutate(release_year = as.Date(release_year))
