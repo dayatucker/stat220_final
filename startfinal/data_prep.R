@@ -38,7 +38,7 @@ get_artists_data <- function(artist_ids, token) {
       tibble(
         artist_id = artist$id,
         artist_name = artist$name,
-        genres = paste(artist$genres, collapse = ", "),
+        genres = str_c(artist$genres, collapse = ", "),
         popularity = artist$popularity,
         followers = artist$followers$total,
         artist_url = artist$external_urls$spotify
@@ -287,7 +287,7 @@ get_album_tracks <- function(album_id, token) {
       track_id = track$id,
       track_name = track$name,
       track_number = track$track_number,
-      track_artists = paste(map_chr(track$artists, "name"), collapse = ", "),
+      track_artists = str_c(map_chr(track$artists, "name"), collapse = ", "),
       track_duration_ms = track$duration_ms,
       track_explicit = track$explicit
     )
@@ -360,7 +360,7 @@ get_new_releases <- function(token, country = "US", limit = 50, offset = 0) {
     tibble(
       album_id = album$id,
       album_name = album$name,
-      artist_name = paste(map_chr(album$artists, "name"), collapse = ", "),
+      artist_name = str_c(map_chr(album$artists, "name"), collapse = ", "),
       release_date = album$release_date,
       total_tracks = album$total_tracks,
       album_type = album$album_type,
@@ -381,23 +381,23 @@ get_all_new_releases <- function(token, country = "US", max_albums = 100) {
 years <- 2018:2024
 
 for (year in years) {
-  album_ids <- get(paste0("album_ids_", year))
+  album_ids <- get(str_c("album_ids_", year))
   
-  assign(paste0("album_data_", year), get_album_data(album_ids, token))
+  assign(str_c("album_data_", year), get_album_data(album_ids, token))
   
-  assign(paste0("album_tracks_", year),
+  assign(str_c("album_tracks_", year),
          map_dfr(album_ids, get_album_tracks, token = token))
   
   combined_df <- left_join(
-    get(paste0("album_data_", year)),
-    get(paste0("album_tracks_", year)),
+    get(str_c("album_data_", year)),
+    get(str_c("album_tracks_", year)),
     by = "album_id"
   )
   
   combined_df <- combined_df %>%
     mutate(charted_year = as.integer(substr(release_date, 1, 4)))
   
-  assign(paste0("combined_", year), combined_df)
+  assign(str_c("combined_", year), combined_df)
 }
 
 

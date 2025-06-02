@@ -16,7 +16,7 @@ ui <- fluidPage(
   titlePanel("Spotify Music Explorer 2018-2024"),
   
   # Random Song Spotlight Section
-  h2("🎵 Random Song Spotlight"),
+  h3("🎵Random Song Spotlight🎵"),
   uiOutput("song_spotlight"),
   
   tabsetPanel(
@@ -176,11 +176,11 @@ server <- function(input, output, session) {
     spotlight_song <- combined_artists_tracks[sample(nrow(combined_artists_tracks), 1), ]
     
     tagList(
-      h3(spotlight_song$track_name),
-      h4(paste("By:", spotlight_song$artist_name)),
-      p(paste("Year:", spotlight_song$charted_year)),
-      p(paste("Genre(s):", spotlight_song$genres)),
-      p(paste("Popularity:", spotlight_song$popularity))
+      h4(spotlight_song$track_name),
+      h4(str_c("By:", spotlight_song$artist_name)),
+      p(str_c("Year:", spotlight_song$charted_year)),
+      p(str_c("Genre(s):", spotlight_song$genres)),
+      p(str_c("Popularity:", spotlight_song$popularity))
     )
   })
   
@@ -224,7 +224,7 @@ server <- function(input, output, session) {
     df <- combined_artists_tracks %>% filter(charted_year == input$track_year, artist_name == input$selected_artist)
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(explicit))) +
       geom_bar(stat = "identity") + coord_flip() +
-      labs(title = paste("Tracks by", input$selected_artist), x = "Track Name", y = "Popularity", fill = "Explicit") +
+      labs(title = str_c("Tracks by", input$selected_artist), x = "Track Name", y = "Popularity", fill = "Explicit") +
       theme_minimal()
     ggplotly(p)
   })
@@ -234,7 +234,7 @@ server <- function(input, output, session) {
     df <- combined_albums_tracks %>% filter(charted_year == input$track_year, album_name == input$selected_album)
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(track_explicit))) +
       geom_bar(stat = "identity") + coord_flip() +
-      labs(title = paste("Tracks from Album:", input$selected_album), x = "Track Name", y = "Popularity", fill = "Explicit") +
+      labs(title = str_c("Tracks from Album:", input$selected_album), x = "Track Name", y = "Popularity", fill = "Explicit") +
       theme_minimal()
     ggplotly(p)
   })
@@ -243,7 +243,7 @@ server <- function(input, output, session) {
   output$genre_scatter <- renderPlotly({
     req(input$selected_genres)
     df <- combined_artists_tracks %>% separate_rows(genres, sep = ",\\s*") %>% filter(genres %in% input$selected_genres) %>%
-      mutate(charted_year = as.factor(charted_year), hover_text = paste("Artist:", artist_name, "<br>Track:", track_name, "<br>Genre:", genres, "<br>Year:", charted_year))
+      mutate(charted_year = as.factor(charted_year), hover_text = str_c("Artist:", artist_name, "<br>Track:", track_name, "<br>Genre:", genres, "<br>Year:", charted_year))
     p <- ggplot(df, aes(x = charted_year, y = genres, text = hover_text)) +
       geom_jitter(alpha = 0.6, color = "#1DB954", width = 0.3, height = 0.2) +
       labs(title = "Specific Genres by Year", x = "Year", y = "Specific Genre") +
@@ -255,7 +255,7 @@ server <- function(input, output, session) {
   output$years_release_plot <- renderPlotly({
     df <- combined_artists_tracks %>%
       filter(!is.na(years_since_release), years_since_release >= input$years_range[1], years_since_release <= input$years_range[2]) %>%
-      mutate(hover_text = paste("Artist:", artist_name, "<br>Track:", track_name, "<br>Years Since Release:", round(years_since_release, 1), "<br>Popularity:", popularity))
+      mutate(hover_text = str_c("Artist:", artist_name, "<br>Track:", track_name, "<br>Years Since Release:", round(years_since_release, 1), "<br>Popularity:", popularity))
     p <- ggplot(df, aes(x = years_since_release, y = popularity, text = hover_text)) +
       geom_point(alpha = 0.6, color = "#1DB954") +
       labs(title = "Track Popularity vs. Years Since Release", x = "Years Since Release", y = "Popularity") +
@@ -270,9 +270,9 @@ server <- function(input, output, session) {
   output$duration_artist_plot <- renderPlotly({
     req(input$duration_artist)
     df <- combined_artists_tracks %>% filter(artist_name == input$duration_artist) %>% mutate(duration_min = track_duration_ms / 60000) %>% filter(duration_min >= input$duration_range[1], duration_min <= input$duration_range[2])
-    p <- ggplot(df, aes(x = duration_min, y = popularity, text = paste("Track:", track_name, "<br>Duration:", round(duration_min, 2), "min<br>Popularity:", popularity))) +
+    p <- ggplot(df, aes(x = duration_min, y = popularity, text = str_c("Track:", track_name, "<br>Duration:", round(duration_min, 2), "min<br>Popularity:", popularity))) +
       geom_point(alpha = 0.7, color = "#1DB954") +
-      labs(title = paste("Popularity vs. Duration for", input$duration_artist), x = "Track Duration (Minutes)", y = "Popularity") +
+      labs(title = str_c("Popularity vs. Duration for", input$duration_artist), x = "Track Duration (Minutes)", y = "Popularity") +
       theme_minimal()
     ggplotly(p, tooltip = "text")
   })
@@ -280,9 +280,9 @@ server <- function(input, output, session) {
   output$duration_album_plot <- renderPlotly({
     req(input$duration_album)
     df <- combined_albums_tracks %>% filter(album_name == input$duration_album) %>% mutate(duration_min = track_duration_ms / 60000) %>% filter(duration_min >= input$duration_range[1], duration_min <= input$duration_range[2])
-    p <- ggplot(df, aes(x = duration_min, y = popularity, text = paste("Track:", track_name, "<br>Artist:", track_artists, "<br>Duration:", round(duration_min, 2), "min<br>Popularity:", popularity))) +
+    p <- ggplot(df, aes(x = duration_min, y = popularity, text = str_c("Track:", track_name, "<br>Artist:", track_artists, "<br>Duration:", round(duration_min, 2), "min<br>Popularity:", popularity))) +
       geom_point(alpha = 0.7, color = "#1DB954") +
-      labs(title = paste("Popularity vs. Duration for Album:", input$duration_album), x = "Track Duration (Minutes)", y = "Popularity") +
+      labs(title = str_c("Popularity vs. Duration for Album:", input$duration_album), x = "Track Duration (Minutes)", y = "Popularity") +
       theme_minimal()
     ggplotly(p, tooltip = "text")
   })
@@ -295,10 +295,10 @@ server <- function(input, output, session) {
       group_by(album_name, track_artists) %>%
       summarise(num_tracks = n(), .groups = "drop") %>%
       arrange(desc(num_tracks)) %>%
-      mutate(hover_text = paste0("Album: ", album_name, "<br>Artist(s): ", track_artists, "<br>Tracks: ", num_tracks))
+      mutate(hover_text = str_c("Album: ", album_name, "<br>Artist(s): ", track_artists, "<br>Tracks: ", num_tracks))
     p <- ggplot(album_counts, aes(x = reorder(album_name, num_tracks), y = num_tracks, text = hover_text)) +
       geom_bar(stat = "identity", fill = "#1DB954") + coord_flip() +
-      labs(title = paste("Number of Tracks per Album in", input$tracks_year), x = "Album Name", y = "Number of Tracks") +
+      labs(title = str_c("Number of Tracks per Album in", input$tracks_year), x = "Album Name", y = "Number of Tracks") +
       theme_minimal() +
       theme(axis.text.y = element_text(angle = 45, hjust = 1))
     ggplotly(p, tooltip = "text")
@@ -317,7 +317,7 @@ server <- function(input, output, session) {
       mutate(has_feature = str_detect(tolower(track_name), "feat\\.|with"),
              feature_label = ifelse(has_feature, "With Feature", "No Feature"))
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = feature_label,
-                        text = paste0("Track: ", track_name, "<br>Popularity: ", popularity, "<br>Feature: ", feature_label))) +
+                        text = str_c("Track: ", track_name, "<br>Popularity: ", popularity, "<br>Feature: ", feature_label))) +
       geom_bar(stat = "identity") +
       coord_flip() +
       labs(title = paste("Tracks from", input$features_album), x = "Track Name", y = "Popularity", fill = "Has Feature") +
