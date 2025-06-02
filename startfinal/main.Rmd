@@ -18,7 +18,7 @@ library(stringr)
 selected_artist <- "Drake"
 
 # Filter tracks for the selected artist
-artist_top_tracks <- combined_tracks |>
+artist_top_tracks <- combined_artists_tracks |>
   filter(artist_name == selected_artist) |>
   distinct(track_name, .keep_all = TRUE)
 

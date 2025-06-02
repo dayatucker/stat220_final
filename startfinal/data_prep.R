@@ -417,18 +417,8 @@ new_releases_combined <- new_album_tracks |>
   mutate(charted_year = as.integer(substr(release_date, 1, 4)))
 
 
-# # Write yearly datasets of artists to CSV files
-# write_csv(all_tracks_2018, "data/all_tracks_2018.csv")
-# write_csv(all_tracks_2019, "data/all_tracks_2019.csv")
-# write_csv(all_tracks_2020, "data/all_tracks_2020.csv")
-# write_csv(all_tracks_2021, "data/all_tracks_2021.csv")
-# write_csv(all_tracks_2022, "data/all_tracks_2022.csv")
-# write_csv(all_tracks_2023, "data/all_tracks_2023.csv")
-# write_csv(all_tracks_2024, "data/all_tracks_2024.csv")
-
 # Write the combined dataset for artists to a CSV file
 write_csv(combined_artists_tracks, "data/combined_artists_tracks_2018_2024.csv")
-
 
 # Write combined dataset for albums to a CSV file
 write_csv(combined_albums_tracks, "data/combined_albums_tracks_2018_2024.csv")

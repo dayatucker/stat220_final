@@ -114,4 +114,31 @@ ggplotly(p, tooltip = "text")
 ```
 
 
+```{r}
+# Get list of unique album names
+album_choices <- unique(new_releases_combined$album_name)
+
+# Default album selection
+selected_album <- album_choices[1]
+
+# Filter the data
+filtered_data <- new_releases_combined %>%
+  filter(album_name == selected_album)
+
+# Create the plot
+a <- ggplot(filtered_data, aes(x = track_name, y = popularity, 
+                               text = paste("Track:", track_name,
+                                            "<br>Popularity:", popularity,
+                                            "<br>Explicit:", track_explicit))) +
+  geom_col(fill = "steelblue") +
+  labs(title = paste("Track Popularity -", selected_album),
+       x = "Track Name", y = "Popularity") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Convert to plotly with tooltip
+ggplotly(a, tooltip = "text")
+
+```
+
 
