@@ -26,3 +26,9 @@ Includes:
 #### `new_releases_combined.csv`: Dataset of new music releases scraped from Spotify's API.
 Includes:
 - dataset 4 info
+
+## Authors
+- Aubrey Tran
+- Daya Tucker
+- Nicholas Chang
+*(STAT220 Final - Spring 2025)*
