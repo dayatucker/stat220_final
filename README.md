@@ -3,8 +3,10 @@ Repo for final project for Stat220
 
 ## Files
 - `data_prep.R`: Contains code for wrangling and cleaning raw data
+- `app.R`:
 - `main.Rmd`: Main file for graphs and visualizations for the report
 - `/data/`: Folder containing all datasets in csv
+- `/www/`:
 - `final_proj_sketch.Rmd`: turn in for project sketch
 - `.txt` files: Delete later
 
