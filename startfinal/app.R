@@ -509,19 +509,19 @@ server <- function(input, output, session) {
       mutate(weekday = weekdays(release_date)) %>%
       filter(weekday == input$selected_weekday)
     p <- ggplot(df, aes(
-      x = reorder(track_name, popularity), 
+      x = reorder(album_name, popularity), 
       y = popularity,
-      text = paste("Track:", track_name,
-                   "<br>Artist:", track_artists,
-                   "<br>Date:", release_date)
+      text = paste("Album:", album_name,
+                   "\nArtist:", track_artists,
+                   "\nDate:", release_date)
     )) +
       geom_col(fill = "#1db954") +
-      coord_flip() +
       labs(
-        title = paste("Track Popularity on", input$selected_weekday, "in April 2024"),
-        x = "Track Name", y = "Popularity"
+        title = str_c("Album Popularity on ", input$selected_weekday, " in April 2024"),
+        x = "Album Name", y = "Popularity"
       ) +
-      theme_minimal()
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p, tooltip = "text")
   })
 
