@@ -10,7 +10,7 @@ combined_albums_tracks <- read_csv("data/combined_albums_tracks_2018_2024.csv")
 new_releases_combined <- read_csv("data/new_releases_combined.csv")
 
 # Release year
-combined_artists_tracks <- combined_artists_tracks %>%
+combined_artists_tracks <- combined_artists_tracks |>
   mutate(release_year = as.integer(release_year))
 
 # Get all unique genres
@@ -205,29 +205,20 @@ ui <- fluidPage(
                             helpText("Select a date range only within April 2024.")
                           ),
                           mainPanel(
-                            plotlyOutput("new_release_date_plot"),
-                            br(),
-                            plotlyOutput("weekday_avg_popularity_plot")
+                            plotlyOutput("new_release_date_plot")
                           )
                         )
                ),
                tabPanel("Weekday",
                         sidebarLayout(
                           sidebarPanel(
-                            selectInput(
-                              inputId = "selected_weekday",
-                              label = "Choose a Weekday:",
-                              choices = c("Monday", "Tuesday", "Wednesday", "Thursday", 
-                                          "Friday", "Saturday", "Sunday"),
-                              selected = "Friday"
-                            ),
-                            helpText("This plot shows tracks released on the selected weekday in April 2024.")
+                            helpText("This plot shows how many tracks were released on each weekday in April 2024.")
                           ),
                           mainPanel(
-                            plotlyOutput("weekday_track_plot")
+                            plotlyOutput("weekday_track_count_plot")
                           )
                         )
-               ),
+               )
              )
     )
   )
@@ -275,42 +266,42 @@ server <- function(input, output, session) {
   # Top Artists/Albums Logic
   
   filtered_artists_year <- reactive({
-    combined_artists_tracks %>%
-      filter(charted_year == input$selected_year) %>%
-      group_by(artist_name, genres, artist_id) %>%
+    combined_artists_tracks |>
+      filter(charted_year == input$selected_year) |>
+      group_by(artist_name, genres, artist_id) |>
       summarise(avg_popularity = round(mean(popularity, na.rm = TRUE), 1),
-                total_tracks = n(), .groups = "drop") %>%
+                total_tracks = n(), .groups = "drop") |>
       arrange(desc(avg_popularity))
   })
   
   filtered_artists <- reactive({
-    combined_artists_tracks %>%
-      filter(charted_year == input$selected_year) %>%
-      group_by(artist_name, genres) %>%
+    combined_artists_tracks |>
+      filter(charted_year == input$selected_year) |>
+      group_by(artist_name, genres) |>
       summarise(avg_popularity = round(mean(popularity, na.rm = TRUE), 1),
-                total_tracks = n(), .groups = "drop") %>%
+                total_tracks = n(), .groups = "drop") |>
       arrange(desc(avg_popularity))
   })
   
   filtered_albums_year <- reactive({
-    combined_albums_tracks %>%
-      filter(charted_year == input$selected_year) %>%
-      group_by(album_name, album_type, album_id) %>%
+    combined_albums_tracks |>
+      filter(charted_year == input$selected_year) |>
+      group_by(album_name, album_type, album_id) |>
       summarise(total_tracks = max(total_tracks),
                 release_date = first(release_date),
                 avg_track_duration_sec = round(mean(track_duration_ms, na.rm = TRUE) / 1000, 1),
-                .groups = "drop") %>%
+                .groups = "drop") |>
       arrange(release_date)
   })
   
   filtered_albums <- reactive({
-    combined_albums_tracks %>%
-      filter(charted_year == input$selected_year) %>%
-      group_by(album_name) %>%
+    combined_albums_tracks |>
+      filter(charted_year == input$selected_year) |>
+      group_by(album_name) |>
       summarise(total_tracks = max(total_tracks),
                 release_date = first(release_date),
                 avg_track_duration_sec = round(mean(track_duration_ms, na.rm = TRUE) / 1000, 1),
-                .groups = "drop") %>%
+                .groups = "drop") |>
       arrange(release_date)
   })
   
@@ -340,7 +331,6 @@ server <- function(input, output, session) {
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
                   loading = "lazy")
     } else {
-      # Placeholder instructions
       p(str_c("Select a row from the table to the right to view the artist's top tracks"))
     }
   })
@@ -362,18 +352,18 @@ server <- function(input, output, session) {
   
   # Dynamic Track Selectors
   output$artist_selector <- renderUI({
-    choices <- combined_artists_tracks %>% filter(charted_year == input$track_year) %>% distinct(artist_name) %>% arrange(artist_name)
+    choices <- combined_artists_tracks |> filter(charted_year == input$track_year) |> distinct(artist_name) |> arrange(artist_name)
     selectInput("selected_artist", "Select Artist:", choices = choices$artist_name)
   })
   
   output$album_selector <- renderUI({
-    choices <- combined_albums_tracks %>% filter(charted_year == input$track_year) %>% distinct(album_name) %>% arrange(album_name)
+    choices <- combined_albums_tracks |> filter(charted_year == input$track_year) |> distinct(album_name) |> arrange(album_name)
     selectInput("selected_album", "Select Album:", choices = choices$album_name)
   })
   
   output$artist_tracks_plot <- renderPlotly({
     req(input$selected_artist)
-    df <- combined_artists_tracks %>%
+    df <- combined_artists_tracks |>
       filter(charted_year == input$track_year, artist_name == input$selected_artist)
     
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(explicit))) +
@@ -381,13 +371,12 @@ server <- function(input, output, session) {
       scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#191414")) +
       labs(title = str_c("Tracks by ", input$selected_artist),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
-      theme_minimal() +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p)
   })
   output$album_tracks_plot <- renderPlotly({
     req(input$selected_album)
-    df <- combined_albums_tracks %>%
+    df <- combined_albums_tracks |>
       filter(charted_year == input$track_year, album_name == input$selected_album)
     
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(track_explicit))) +
@@ -395,7 +384,6 @@ server <- function(input, output, session) {
       scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#191414")) +
       labs(title = str_c("Tracks from Album: ", input$selected_album),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
-      theme_minimal() +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p)
   })
@@ -403,87 +391,120 @@ server <- function(input, output, session) {
   # Genre Tab
   output$genre_scatter <- renderPlotly({
     req(input$selected_genres)
-    df <- combined_artists_tracks %>% separate_rows(genres, sep = ",\\s*") %>% filter(genres %in% input$selected_genres) %>%
+    df <- combined_artists_tracks |> separate_rows(genres, sep = ",\\s*") |> filter(genres %in% input$selected_genres) |>
       mutate(charted_year = as.factor(charted_year), hover_text = str_c("Artist: ", artist_name, "\nTrack: ", track_name, "\nGenre: ", genres, "\nYear: ", charted_year))
     p <- ggplot(df, aes(x = charted_year, y = genres, text = hover_text)) +
       geom_jitter(alpha = 0.6, color = "#1ed760", width = 0.3, height = 0.2) +
-      labs(title = "Specific Genres by Year", x = "Year", y = "Specific Genre") +
-      theme_minimal()
+      labs(title = "Specific Genres by Year", x = "Year", y = "Specific Genre")
     ggplotly(p, tooltip = "text")
   })
   
   # Years Since Release
   output$years_release_plot <- renderPlotly({
-    df <- combined_artists_tracks %>%
-      filter(!is.na(years_since_release), years_since_release >= input$years_range[1], years_since_release <= input$years_range[2]) %>%
+    df <- combined_artists_tracks |>
+      filter(!is.na(years_since_release), years_since_release >= input$years_range[1], years_since_release <= input$years_range[2]) |>
       mutate(hover_text = str_c("Artist: ", artist_name, "\nTrack: ", track_name, "\nYears Since Release: ", round(years_since_release, 1), "\nPopularity: ", popularity))
     p <- ggplot(df, aes(x = years_since_release, y = popularity, text = hover_text)) +
       geom_point(alpha = 0.6, color = "#1ed760") +
-      labs(title = "Track Popularity vs. Years Since Release", x = "Years Since Release", y = "Popularity") +
-      theme_minimal()
+      labs(title = "Track Popularity vs. Years Since Release", x = "Years Since Release", y = "Popularity")
     ggplotly(p, tooltip = "text")
   })
   
   # Track Duration
-  output$duration_artist_selector <- renderUI({ selectInput("duration_artist", "Select Artist:", choices = sort(unique(combined_artists_tracks$artist_name))) })
-  output$duration_album_selector <- renderUI({ selectInput("duration_album", "Select Album:", choices = sort(unique(combined_albums_tracks$album_name))) })
+  output$duration_artist_selector <- renderUI({
+    selectInput("duration_artist", "Select Artist:",
+                choices = c("All", sort(unique(combined_artists_tracks$artist_name))),
+                selected = "All")
+  })
+  
+  output$duration_album_selector <- renderUI({
+    selectInput("duration_album", "Select Album:",
+                choices = c("All", sort(unique(combined_albums_tracks$album_name))),
+                selected = "All")
+  })
   
   output$duration_artist_plot <- renderPlotly({
     req(input$duration_artist)
-    df <- combined_artists_tracks %>% filter(artist_name == input$duration_artist) %>% mutate(duration_min = track_duration_ms / 60000) %>% filter(duration_min >= input$duration_range[1], duration_min <= input$duration_range[2])
-    p <- ggplot(df, aes(x = duration_min, y = popularity, text = str_c("Track:", track_name, "\nDuration:", round(duration_min, 2), "min\nPopularity:", popularity))) +
+    
+    df <- combined_artists_tracks |>
+      mutate(duration_min = track_duration_ms / 60000) |>
+      filter(duration_min >= input$duration_range[1], duration_min <= input$duration_range[2])
+    
+    if (input$duration_artist != "All") {
+      df <- df |> filter(artist_name == input$duration_artist)
+    }
+    
+    p <- ggplot(df, aes(x = duration_min, y = popularity,
+                        text = str_c("Track: ", track_name,
+                                     "\nArtist: ", artist_name,
+                                     "\nDuration: ", round(duration_min, 2), " min",
+                                     "\nPopularity: ", popularity))) +
       geom_point(alpha = 0.7, color = "#1ed760") +
-      labs(title = str_c("Popularity vs. Duration for ", input$duration_artist), x = "Track Duration (Minutes)", y = "Popularity") +
-      theme_minimal()
+      labs(title = ifelse(input$duration_artist == "All",
+                          "Popularity vs. Duration for All Artists",
+                          str_c("Popularity vs. Duration for ", input$duration_artist)),
+           x = "Track Duration (Minutes)", y = "Popularity")
     ggplotly(p, tooltip = "text")
   })
   
   output$duration_album_plot <- renderPlotly({
     req(input$duration_album)
-    df <- combined_albums_tracks %>% filter(album_name == input$duration_album) %>% mutate(duration_min = track_duration_ms / 60000) %>% filter(duration_min >= input$duration_range[1], duration_min <= input$duration_range[2])
-    p <- ggplot(df, aes(x = duration_min, y = popularity, text = str_c("Track:", track_name, "\nArtist:", track_artists, "\nDuration:", round(duration_min, 2), "min\nPopularity:", popularity))) +
+    
+    df <- combined_albums_tracks |>
+      mutate(duration_min = track_duration_ms / 60000) |>
+      filter(duration_min >= input$duration_range[1], duration_min <= input$duration_range[2])
+    
+    if (input$duration_album != "All") {
+      df <- df |> filter(album_name == input$duration_album)
+    }
+    
+    p <- ggplot(df, aes(x = duration_min, y = popularity,
+                        text = str_c("Track: ", track_name,
+                                     "\nAlbum: ", album_name,
+                                     "\nArtist: ", track_artists,
+                                     "\nDuration: ", round(duration_min, 2), " min",
+                                     "\nPopularity: ", popularity))) +
       geom_point(alpha = 0.7, color = "#1ed760") +
-      labs(title = str_c("Popularity vs. Duration for Album:", input$duration_album), x = "Track Duration (Minutes)", y = "Popularity") +
-      theme_minimal()
+      labs(title = ifelse(input$duration_album == "All",
+                          "Popularity vs. Duration for All Albums",
+                          str_c("Popularity vs. Duration for Album: ", input$duration_album)),
+           x = "Track Duration (Minutes)", y = "Popularity")
     ggplotly(p, tooltip = "text")
   })
   
   # Number of Tracks in Album
   output$album_tracks_count_plot <- renderPlotly({
     req(input$tracks_year)
-    album_counts <- combined_albums_tracks %>%
-      filter(charted_year == input$tracks_year) %>%
-      group_by(album_name, track_artists) %>%
-      summarise(num_tracks = n(), .groups = "drop") %>%
-      arrange(desc(num_tracks)) %>%
+    album_counts <- combined_albums_tracks |>
+      filter(charted_year == input$tracks_year) |>
+      group_by(album_name, track_artists) |>
+      summarise(num_tracks = n(), .groups = "drop") |>
+      arrange(desc(num_tracks)) |>
       mutate(hover_text = str_c("Album: ", album_name, "\nArtist(s): ", track_artists, "\nTracks: ", num_tracks))
     p <- ggplot(album_counts, aes(x = reorder(album_name, num_tracks), y = num_tracks, text = hover_text)) +
       geom_bar(stat = "identity", fill = "#1ed760") + coord_flip() +
       labs(title = str_c("Number of Tracks per Album in ", input$tracks_year), x = "Album Name", y = "Number of Tracks") +
-      theme_minimal() +
       theme(axis.text.y = element_text(angle = 45, hjust = 1))
     ggplotly(p, tooltip = "text")
   })
   
   # Tracks with Features Tab
   output$features_album_selector <- renderUI({
-    choices <- combined_albums_tracks %>% filter(charted_year == input$features_year) %>% distinct(album_name) %>% arrange(album_name)
+    choices <- combined_albums_tracks |> filter(charted_year == input$features_year) |> distinct(album_name) |> arrange(album_name)
     selectInput("features_album", "Select Album:", choices = choices$album_name)
   })
   
   output$featured_tracks_plot <- renderPlotly({
     req(input$features_album)
-    df <- combined_albums_tracks %>%
-      filter(charted_year == input$features_year, album_name == input$features_album) %>%
+    df <- combined_albums_tracks |>
+      filter(charted_year == input$features_year, album_name == input$features_album) |>
       mutate(has_feature = str_detect(tolower(track_name), "feat\\.|with"),
              feature_label = ifelse(has_feature, "With Feature", "No Feature"))
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = feature_label,
                         text = str_c("Track: ", track_name, "\nPopularity: ", popularity, "\nFeature: ", feature_label))) +
       geom_bar(stat = "identity") +
       coord_flip() +
-      labs(title = paste("Tracks from", input$features_album), x = "Track Name", y = "Popularity", fill = "Has Feature") +
-      theme_minimal() +
-      theme(axis.text.y = element_text(angle = 0, hjust = 1))
+      labs(title = paste("Tracks from", input$features_album), x = "Track Name", y = "Popularity", fill = "Has Feature")
     ggplotly(p, tooltip = "text")
   })
   
@@ -541,19 +562,17 @@ server <- function(input, output, session) {
            x = "Year",
            y = "Word Frequency",
            color = "Sentiment",
-           linetype = "Word") +
-      theme_minimal()
-    
+           linetype = "Word")
     ggplotly(p)
   })
   
   # New Album Releases Tab Logic
   output$new_release_date_plot <- renderPlotly({
     new_releases_combined$release_date <- as.Date(new_releases_combined$release_date)
-    df <- new_releases_combined %>%
+    df <- new_releases_combined |>
       filter(release_date >= input$release_date_range[1],
              release_date <= input$release_date_range[2])
-    df <- df %>%
+    df <- df |>
       mutate(weekday = format(release_date, "%A"))
     p <- ggplot(df, aes(
       x = release_date,
@@ -567,53 +586,30 @@ server <- function(input, output, session) {
     )) +
       geom_point(alpha = 0.6, color = "#1ed760") +
       labs(title = "Popularity vs. Release Date", x = "Release Date", y = "Popularity") +
-      theme_minimal() +
       scale_x_date(date_breaks = "1 day", date_labels = "%m-%d-%y") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p, tooltip = "text")
   })
   
-  output$weekday_avg_popularity_plot <- renderPlotly({
-    df <- new_releases_combined %>%
-      filter(release_date >= input$release_date_range[1],
-             release_date <= input$release_date_range[2]) %>%
-      mutate(weekday = weekdays(release_date)) %>%
-      group_by(weekday) %>%
-      summarise(avg_popularity = round(mean(popularity, na.rm = TRUE))) %>%
-      mutate(weekday = factor(weekday, 
-                              levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
-                                         "Friday", "Saturday", "Sunday")))
-    p <- ggplot(df, aes(x = weekday, y = avg_popularity, fill = weekday,
-                        text = str_c(
-                          "Weekday: ", weekday,
-                          "\nAvgerage Popularity: ", avg_popularity
-                        ))) +
-      geom_col(show.legend = FALSE) +
-      labs(title = "Average Popularity by Weekday",
-           x = "Weekday", y = "Average Popularity") +
-      theme_minimal()
-    ggplotly(p, tooltip = "text")
-  })
-  
-  output$weekday_track_plot <- renderPlotly({
-    df <- new_releases_combined %>%
-      filter(format(release_date, "%Y-%m") == "2024-04") %>%
-      mutate(weekday = weekdays(release_date)) %>%
-      filter(weekday == input$selected_weekday)
+  output$weekday_track_count_plot <- renderPlotly({
+    df <- new_releases_combined |>
+      filter(format(release_date, "%Y-%m") == "2024-04") |>
+      mutate(weekday = weekdays(release_date)) |>
+      count(weekday, name = "track_count") |>
+      mutate(weekday = factor(
+        weekday,
+        levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
+                   "Friday", "Saturday", "Sunday")
+      ))
+    
     p <- ggplot(df, aes(
-      x = reorder(album_name, popularity), 
-      y = popularity,
-      text = paste("Album:", album_name,
-                   "\nArtist:", track_artists,
-                   "\nDate:", release_date)
+      x = weekday, y = track_count, fill = weekday,
+      text = paste("Weekday:", weekday, "\nTracks Released:", track_count)
     )) +
-      geom_col(fill = "#1db954") +
+      geom_col(show.legend = FALSE) +
       labs(
-        title = str_c("Album Popularity on ", input$selected_weekday, " in April 2024"),
-        x = "Album Name", y = "Popularity"
-      ) +
-      theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+        title = "New Tracks Released by Weekday (April 2024)",
+        x = "Weekday", y = "Number of Tracks")
     ggplotly(p, tooltip = "text")
   })
 
