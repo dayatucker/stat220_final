@@ -30,5 +30,6 @@ Includes:
 ## Authors
 - Aubrey Tran
 - Daya Tucker
-- Nicholas Chang\n
+- Nicholas Chang
+  
 *(STAT220 Final - Spring 2025)*
