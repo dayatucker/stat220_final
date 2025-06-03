@@ -76,12 +76,22 @@ ui <- fluidPage(
     tabPanel("Years Since Release",
              sidebarLayout(
                sidebarPanel(
-                 sliderInput("years_range", "Select Years Since Release:",
-                             min = floor(min(combined_artists_tracks$years_since_release, na.rm = TRUE)),
-                             max = ceiling(max(combined_artists_tracks$years_since_release, na.rm = TRUE)),
-                             value = c(0, 5), step = 0.5)
+                 sliderInput(
+                   "years_range",
+                   "Select Years Since Release Range:",
+                   min = floor(min(combined_artists_tracks$years_since_release, na.rm = TRUE)),
+                   max = ceiling(max(combined_artists_tracks$years_since_release, na.rm = TRUE)),
+                   value = c(
+                     floor(min(combined_artists_tracks$years_since_release, na.rm = TRUE)),
+                     ceiling(max(combined_artists_tracks$years_since_release, na.rm = TRUE))
+                   ),
+                   step = 1
+                 ),
+                 helpText("Negative values indicate tracks released after the charting year (e.g., pre-releases or delayed data).")
                ),
-               mainPanel(plotlyOutput("years_release_plot"))
+               mainPanel(
+                 plotlyOutput("years_release_plot", height = "600px")
+               )
              )
     ),
     
