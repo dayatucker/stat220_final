@@ -203,8 +203,6 @@ server <- function(input, output, session) {
     
     spotlight_song <- combined_artists_tracks[sample(nrow(combined_artists_tracks), 1), ]
     
-    print(spotlight_song)
-    
     link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator")
     
     fire <- ""
@@ -233,7 +231,7 @@ server <- function(input, output, session) {
               picture-in-picture", 
                   loading="lazy"),
       p(str_c("Year Released: ", as.integer(spotlight_song$release_year))),
-      p(str_c("Popularity: ", spotlight_song$popularity))
+      p(str_c("Popularity: ", spotlight_song$popularity, fire))
     )
   })
   
