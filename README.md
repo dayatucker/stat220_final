@@ -1,5 +1,6 @@
 # Spotify Music Explorer 2018-2024
-Repo for final project for Stat220
+## By: Aubrey Tran, Daya Tucker, and Nicholas Chang
+This repository contains the final project for STAT 220, which explores trends in Spotify music data from 2018 to 2024. The project includes data wrangling, visualization, and a Shiny web app for interactive exploration.
 
 ## Files
 - `data_prep.R`: Contains code for wrangling and cleaning raw data
