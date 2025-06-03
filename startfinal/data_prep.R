@@ -400,29 +400,6 @@ get_all_new_releases <- function(token, country = "US", max_albums = 100) {
   }) |> head(max_albums)
 }
 
-# years <- 2018:2024
-# 
-# for (year in years) {
-#   album_ids <- get(str_c("album_ids_", year))
-#   
-#   assign(str_c("album_data_", year), get_album_data(album_ids, token))
-#   
-#   assign(str_c("album_tracks_", year),
-#          map_dfr(album_ids, get_album_tracks, token = token))
-#   
-#   combined_df <- left_join(
-#     get(str_c("album_data_", year)),
-#     get(str_c("album_tracks_", year)),
-#     by = "album_id"
-#   )
-#   
-#   combined_df <- combined_df %>%
-#     mutate(charted_year = as.integer(substr(release_date, 1, 4)))
-#   
-#   assign(str_c("combined_", year), combined_df)
-# }
-
-
 
 # Get latest new releases
 new_releases <- get_all_new_releases(token, max_albums = 100)

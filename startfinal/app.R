@@ -487,12 +487,12 @@ server <- function(input, output, session) {
       df <- df |> filter(album_name == input$duration_album)
     }
     
-    p <- ggplot(df, aes(x = duration_min, y = popularity,
+    p <- ggplot(df, aes(x = duration_min, y = track_popularity,
                         text = str_c("Track: ", track_name,
                                      "\nAlbum: ", album_name,
                                      "\nArtist: ", track_artists,
                                      "\nDuration: ", round(duration_min, 2), " min",
-                                     "\nPopularity: ", popularity))) +
+                                     "\nPopularity: ", track_popularity))) +
       geom_point(alpha = 0.7, color = "#1ed760") +
       labs(title = ifelse(input$duration_album == "All",
                           "Popularity vs. Duration for All Albums",
@@ -529,8 +529,8 @@ server <- function(input, output, session) {
       filter(charted_year == input$features_year, album_name == input$features_album) |>
       mutate(has_feature = str_detect(tolower(track_name), "feat\\.|with"),
              feature_label = ifelse(has_feature, "With Feature", "No Feature"))
-    p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = feature_label,
-                        text = str_c("Track: ", track_name, "\nPopularity: ", popularity, "\nFeature: ", feature_label))) +
+    p <- ggplot(df, aes(x = reorder(track_name, track_popularity), y = track_popularity, fill = feature_label,
+                        text = str_c("Track: ", track_name, "\nPopularity: ", track_popularity, "\nFeature: ", feature_label))) +
       geom_bar(stat = "identity") +
       coord_flip() +
       labs(title = paste("Tracks from", input$features_album), x = "Track Name", y = "Popularity", fill = "Has Feature")
