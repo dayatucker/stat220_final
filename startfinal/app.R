@@ -282,11 +282,8 @@ server <- function(input, output, session) {
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
                   loading = "lazy")
     } else {
-      # Default iframe (e.g., a placeholder or the random song spotlight)
-      tags$iframe(src = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator", 
-                  width = "100%", height = "600", frameBorder = "0", allowfullscreen = "", 
-                  allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
-                  loading = "lazy")
+      # Placeholder instructions
+      p(str_c("Select a row from the table to the right to view the artist's top hits or the album's tracks"))
     }
   })
   
