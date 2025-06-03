@@ -27,7 +27,16 @@ ui <- fluidPage(
     tabPanel("Top Artists/Albums",
              sidebarLayout(
                sidebarPanel(
-                 selectInput("selected_year", "Select Year:", choices = 2018:2024, selected = 2024)
+                 selectInput("selected_year", "Select Year:", choices = 2018:2024, selected = 2024),
+                 tags$iframe(
+                   src = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0", # Example Spotify playlist URL
+                   width = "100%", 
+                   height = "1000", 
+                   frameBorder = "0", 
+                   allowfullscreen = "", 
+                   allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
+                   loading = "lazy"
+                 )
                ),
                mainPanel(
                  h3("Top Artists"),
@@ -212,7 +221,7 @@ server <- function(input, output, session) {
     
     spotlight_song <- combined_artists_tracks[sample(nrow(combined_artists_tracks), 1), ]
     
-    link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator")
+    link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator&theme=0")
     
     fire <- ""
     
