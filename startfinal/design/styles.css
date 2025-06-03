@@ -1,7 +1,77 @@
 body {
     background-color:	#121212; /* Dark background */
     color: #ffffff; /* White text */
+    font-family: "Helvetica", sans-serif;
 }
 .nav-tabs li a {
-    color: #1db954; /* Green tab text */
+    color: #ffffff; /* Green tab text */
+}
+
+.nav-tabs li a:hover {
+    background-color: #535353; /* Lighter gray on hover */
+    color: ##ffffff;
+    border: none;
+}
+
+.nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:hover, 
+.nav-tabs > li.active > a:focus {
+    background-color: #1ed760 !important; /* Lighter gray when selected */
+    color: #121212 !important;
+    border: none;
+}
+
+.well {
+  background-color: #121212;
+}
+/* Dropdown styles for better visibility */
+.selectize-input input {
+    background-color: #1ed760; !important /* Green background for input field */
+    color: #ffffff !important; /* White text for readability */
+    border: 2px solid #1ed760; /* Green border for visibility */
+    border-radius: 4px; /* Optional: Rounded corners */
+}
+.selectize-input.focus {
+    border-color: #ffffff; /* White border when focused for emphasis */
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5); /* Subtle glow effect */
+}
+.selectize-dropdown {
+    background-color: #2c2f33; /* Match input background */
+    color: #ffffff; /* White text */
+    border: 2px solid #1ed760; /* Green border */
+    border-radius: 4px; /* Optional: Rounded corners */
+}
+
+div.selectize-dropdown .option.active {
+    background-color: #1ed760 !important; /* Darker gray for selected option */
+    color
+    color: #121212 !important; /* Ensure text remains visible */
+}
+
+
+.selectize-dropdown .option:hover {
+    background-color: #1ed760 !important; /* Green highlight on hover, override active */
+    color: #121212; /* White text on hover */
+}
+
+.selectize-dropdown .option:focus {
+    background-color: #1ed760 !important;
+    color: #121212 !important;
+}
+
+.dataTable tbody tr:nth-child(odd) {
+    background-color: #212121; /* Odd rows */
+}
+
+.dataTable tbody tr:nth-child(even) {
+    background-color: #121212; /* Even rows */
+}
+
+/* Ensure text remains readable */
+.dataTable tbody tr {
+    color: #ffffff;
+}
+
+div.datatables {
+  color: #ffffff;
 }
