@@ -216,7 +216,7 @@ ui <- fluidPage(
                           )
                         )
                ),
-               tabPanel("Weekday",
+               tabPanel("Weekday of Album Release",
                         sidebarLayout(
                           sidebarPanel(
                             helpText("This plot shows how many tracks were released on each weekday in April 2024.")
