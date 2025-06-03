@@ -9,8 +9,18 @@ combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv"
 combined_albums_tracks <- read_csv("data/combined_albums_tracks_2018_2024.csv")
 new_releases_combined <- read_csv("data/new_releases_combined.csv")
 
+# Release year
 combined_artists_tracks <- combined_artists_tracks %>%
   mutate(release_year = as.integer(release_year))
+
+# Get all unique genres
+genre_choices <- combined_artists_tracks |>
+  separate_rows(genres, sep = ",\\s*") |>
+  distinct(genres) |>
+  arrange(genres) |>
+  pull(genres)
+# Randomly select 3 genres
+selected_genres <- sample(genre_choices, 3)
 
 # UI ----
 ui <- fluidPage(
@@ -67,9 +77,12 @@ ui <- fluidPage(
     tabPanel("Track Genre",
              sidebarLayout(
                sidebarPanel(
-                 checkboxGroupInput("selected_genres", "Select General Genres:",
-                                    choices = sort(unique(unlist(str_split(combined_artists_tracks$genres, ",\\s*")))),
-                                    selected = NULL)
+                 checkboxGroupInput(
+                   inputId = "selected_genres",
+                   label = "Select Genres:",
+                   choices = genre_choices,
+                   selected = selected_genres
+                 )
                ),
                mainPanel(plotlyOutput("genre_scatter"))
              )
