@@ -2,6 +2,7 @@ library(shiny)
 library(tidyverse)
 library(DT)
 library(plotly)
+library(tidytext)
 
 # Load Data ----
 combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv")
@@ -131,6 +132,22 @@ ui <- fluidPage(
              )
     ),
     
+    # Most Common Words in Track Names
+    tabPanel("Most Common Words in Track Names",
+             fluidPage(
+               sidebarLayout(
+                 sidebarPanel(
+                   checkboxGroupInput("selected_words", "Select Words to Display:",
+                                      choices = NULL, selected = NULL),
+                   helpText("Words are colored by sentiment (positive/negative)")
+                 ),
+                 mainPanel(
+                   plotlyOutput("word_trend_plot")
+                 )
+               )
+             )
+    ),
+    
     # New Album Releases Tab
     tabPanel("New Album Releases",
              tabsetPanel(
@@ -191,7 +208,7 @@ server <- function(input, output, session) {
               picture-in-picture", 
                   loading="lazy"),
       p(str_c("Year Released: ", as.integer(spotlight_song$release_year))),
-      p(str_c("Popularity: ", spotlight_song$popularity)),
+      p(str_c("Popularity: ", spotlight_song$popularity))
     )
   })
   
@@ -335,6 +352,66 @@ server <- function(input, output, session) {
       theme_minimal() +
       theme(axis.text.y = element_text(angle = 0, hjust = 1))
     ggplotly(p, tooltip = "text")
+  })
+  
+  # Most Common Words in Track Names
+  # Load sentiment lexicon
+  bing_sentiments <- get_sentiments("bing")
+  
+  # Reactive expression to get top 10 words with sentiment
+  top_words_sentiment <- reactive({
+    
+    word_data <- combined_albums_tracks |>
+      unnest_tokens(word, track_name) |>
+      filter(!is.na(charted_year)) |>
+      anti_join(stop_words, by = "word") |>
+      count(charted_year, word, sort = TRUE)
+    
+    # Top 10 overall
+    top_words <- word_data |>
+      group_by(word) |>
+      summarise(total = sum(n), .groups = "drop") |>
+      top_n(10, total) |>
+      left_join(bing_sentiments, by = "word") |>
+      mutate(sentiment = replace_na(sentiment, "neutral"))
+    
+    list(top_words = top_words, word_counts = word_data)
+  })
+  
+  # Update word choices in checkboxGroupInput
+  observe({
+    words <- top_words_sentiment()$top_words$word
+    updateCheckboxGroupInput(inputId = "selected_words",
+                             choices = words,
+                             selected = words)
+  })
+  
+  # Render the sentiment plot
+  output$word_trend_plot <- renderPlotly({
+    
+    req(input$selected_words)
+    
+    data_all <- top_words_sentiment()
+    top_words <- data_all$top_words
+    word_counts <- data_all$word_counts
+    
+    # Filter to selected words
+    selected_trends <- word_counts |>
+      semi_join(top_words |> filter(word %in% input$selected_words), by = "word") |>
+      left_join(top_words |> select(word, sentiment), by = "word")
+    
+    # Plot
+    p <- selected_trends |>
+      ggplot(aes(x = charted_year, y = n, color = sentiment, group = word)) +
+      geom_line(aes(linetype = word), size = 1.1) +
+      labs(title = "Trends in Usage of Common Track Name Words",
+           x = "Year",
+           y = "Word Frequency",
+           color = "Sentiment",
+           linetype = "Word") +
+      theme_minimal()
+    
+    ggplotly(p)
   })
   
   # New Album Releases Tab Logic

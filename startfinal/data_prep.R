@@ -3,6 +3,7 @@ library(tidyverse)
 library(httr2)
 library(httr)
 library(stringr)
+library(scales)
 
 
 # API Setup + Token
