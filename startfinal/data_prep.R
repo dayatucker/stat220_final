@@ -440,5 +440,4 @@ write_csv(combined_albums_tracks, "data/combined_albums_tracks_2018_2024.csv")
 # Write new releases dataset (most updated from Spotify)
 write_csv(new_releases_combined, "data/new_releases_combined.csv")
 
-# Data Prep -------------------------------------------------------------------
 

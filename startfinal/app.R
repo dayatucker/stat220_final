@@ -9,6 +9,8 @@ combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv"
 combined_albums_tracks <- read_csv("data/combined_albums_tracks_2018_2024.csv")
 new_releases_combined <- read_csv("data/new_releases_combined.csv")
 
+# Data Prep ----
+
 # Release year
 combined_artists_tracks <- combined_artists_tracks |>
   mutate(release_year = as.integer(release_year))
