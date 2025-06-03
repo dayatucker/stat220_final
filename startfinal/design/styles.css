@@ -71,8 +71,8 @@ div.selectize-dropdown .option.active {
 
 .dataTables_filter input:focus {
   outline: none; /* Remove default outline */
-  border: 2px solid #1db954 !important; /* Green border on focus */
-  box-shadow: 0 0 5px #1db954; /* Optional: Add a subtle green glow */
+  border: 2px solid #1ed760 !important; /* Green border on focus */
+  box-shadow: 0 0 5px #1ed760; /* Optional: Add a subtle green glow */
 }
 
 div.datatables {
