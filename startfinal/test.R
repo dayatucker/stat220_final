@@ -10,12 +10,10 @@ combined_albums_tracks <- read_csv("data/combined_albums_tracks_2018_2024.csv")
 new_releases_combined <- read_csv("data/new_releases_combined.csv")
 
 combined_artists_tracks <- combined_artists_tracks %>%
-  mutate(release_year = as.Date(release_year))
+  mutate(release_year = as.integer(release_year))
 
 # UI ----
 ui <- fluidPage(
-  #includeCSS("design/styles.css"),
-  
   titlePanel("Spotify Music Explorer 2018-2024"),
   
   # Random Song Spotlight Section
@@ -203,19 +201,9 @@ server <- function(input, output, session) {
     
     spotlight_song <- combined_artists_tracks[sample(nrow(combined_artists_tracks), 1), ]
     
+    print(spotlight_song)
+    
     link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator")
-    
-    fire <- ""
-    
-    if (spotlight_song$popularity >= 80) {
-      fire <- "🔥"
-    }
-    if (spotlight_song$popularity >= 90) {
-      fire <- "🔥🔥"
-    }
-    if (spotlight_song$popularity >= 95) {
-      fire <- "🔥🔥🔥"
-    }
     
     tagList(
       tags$iframe(src=link, 
@@ -230,7 +218,7 @@ server <- function(input, output, session) {
               picture-in-picture", 
                   loading="lazy"),
       p(str_c("Year Released: ", as.integer(spotlight_song$release_year))),
-      p(str_c("Popularity: ", spotlight_song$popularity, fire))
+      p(str_c("Popularity: ", spotlight_song$popularity))
     )
   })
   
@@ -271,21 +259,30 @@ server <- function(input, output, session) {
   
   output$artist_tracks_plot <- renderPlotly({
     req(input$selected_artist)
-    df <- combined_artists_tracks %>% filter(charted_year == input$track_year, artist_name == input$selected_artist)
+    df <- combined_artists_tracks %>%
+      filter(charted_year == input$track_year, artist_name == input$selected_artist)
+    
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(explicit))) +
-      geom_bar(stat = "identity") + coord_flip() +
-      labs(title = str_c("Tracks by", input$selected_artist), x = "Track Name", y = "Popularity", fill = "Explicit") +
-      theme_minimal()
+      geom_bar(stat = "identity") +
+      scale_fill_manual(values = c("FALSE" = "#1DB954", "TRUE" = "#191414")) +
+      labs(title = str_c("Tracks by ", input$selected_artist),
+           x = "Track Name", y = "Popularity", fill = "Explicit") +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p)
   })
-  
   output$album_tracks_plot <- renderPlotly({
     req(input$selected_album)
-    df <- combined_albums_tracks %>% filter(charted_year == input$track_year, album_name == input$selected_album)
+    df <- combined_albums_tracks %>%
+      filter(charted_year == input$track_year, album_name == input$selected_album)
+    
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(track_explicit))) +
-      geom_bar(stat = "identity") + coord_flip() +
-      labs(title = str_c("Tracks from Album:", input$selected_album), x = "Track Name", y = "Popularity", fill = "Explicit") +
-      theme_minimal()
+      geom_bar(stat = "identity") +
+      scale_fill_manual(values = c("FALSE" = "#1DB954", "TRUE" = "#191414")) +
+      labs(title = str_c("Tracks from Album: ", input$selected_album),
+           x = "Track Name", y = "Popularity", fill = "Explicit") +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p)
   })
   
@@ -425,7 +422,7 @@ server <- function(input, output, session) {
     # Plot
     p <- selected_trends |>
       ggplot(aes(x = charted_year, y = n, color = sentiment, group = word)) +
-      geom_line(aes(linetype = word), size = 1.1) +
+      geom_line(aes(linetype = word)) +
       labs(title = "Trends in Usage of Common Track Name Words",
            x = "Year",
            y = "Word Frequency",
