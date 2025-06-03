@@ -1,4 +1,4 @@
-# stat220_final
+# potify Music Explorer 2018-2024
 Repo for final project for Stat220
 
 ## Files
