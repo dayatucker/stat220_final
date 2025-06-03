@@ -109,7 +109,7 @@ div.dataTables_length select option {
 
 
 div.dataTables_length select option:hover {
-  background-color: #1ed760;
+  background-color: #1ed760 !important;
   color: #121212 !important;
 }
 
@@ -134,3 +134,56 @@ div.well {
     color: #121212 !important; 
     background-color: #1ed760 !important;
 }
+
+/* Default style for the date picker pop-up (gray background, white text) */
+.datepicker {
+  background-color: #212121;
+  color: #ffffff;
+}
+/* Style for individual day cells in the calendar */
+.datepicker .day {
+  background-color: #212121;
+  color: #ffffff;
+}
+/* Hover style for the days (green background, black text) */
+.datepicker .day:hover {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+/* Style for the selected day */
+.datepicker .day.active {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.datepicker .month:hover {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.datepicker .month.active {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.datepicker .year:hover {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.datepicker .year.active {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
