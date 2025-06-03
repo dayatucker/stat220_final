@@ -5,6 +5,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'SpotifyMixBold';
+    src: url('spotifymixbold.woff') format('woff'), url('spotifymixbold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
     font-family: 'SpotifyMix', Arial, sans-serif !important;
 }
@@ -14,6 +21,11 @@ body {
     color: #ffffff;
 
 }
+
+h2, h3, h4, h5 {
+  font-family: 'SpotifyMixBold', Arial, sans-serif !important;
+}
+
 .nav-tabs li a {
     color: #ffffff;
 }
