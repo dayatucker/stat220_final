@@ -161,14 +161,19 @@ ui <- fluidPage(
     ),
     
     # New Album Releases Tab
-    tabPanel("New Album Releases",
+    tabPanel("New Album Releases 2024",
              tabsetPanel(
                tabPanel("By Date",
                         sidebarLayout(
                           sidebarPanel(
-                            dateRangeInput("release_date_range", "Select Release Date Range:",
-                                           start = min(new_releases_combined$release_date, na.rm = TRUE),
-                                           end = max(new_releases_combined$release_date, na.rm = TRUE))
+                            dateRangeInput(
+                              inputId = "release_date_range",
+                              label = "Select Release Date Range:",
+                              start = min(new_releases_combined$release_date, na.rm = TRUE),
+                              end = max(new_releases_combined$release_date, na.rm = TRUE),
+                              min = min(new_releases_combined$release_date, na.rm = TRUE),
+                              max = max(new_releases_combined$release_date, na.rm = TRUE)
+                            )
                           ),
                           mainPanel(plotlyOutput("new_release_date_plot"))
                         )
@@ -449,11 +454,26 @@ server <- function(input, output, session) {
   # New Album Releases Tab Logic
   output$new_release_date_plot <- renderPlotly({
     df <- new_releases_combined %>%
-      filter(release_date >= input$release_date_range[1], release_date <= input$release_date_range[2])
-    p <- ggplot(df, aes(x = release_date, y = popularity, text = paste("Track:", track_name, "\nArtist:", track_artists))) +
+      filter(release_date >= input$release_date_range[1],
+             release_date <= input$release_date_range[2])
+    df <- df %>%
+      mutate(weekday = format(release_date, "%A"))
+    p <- ggplot(df, aes(
+      x = release_date,
+      y = popularity,
+      text = str_c(
+        "Track: ", track_name,
+        "\nArtist: ", track_artists,
+        "\nRelease Date: ", release_date,
+        " (", weekday, ")"
+      )
+    )) +
       geom_point(alpha = 0.6, color = "#1ed760") +
       labs(title = "Popularity vs. Release Date", x = "Release Date", y = "Popularity") +
-      theme_minimal()
+      theme_minimal() +
+      scale_x_date(date_breaks = "1 day", date_labels = "%m-%d-%y") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    
     ggplotly(p, tooltip = "text")
   })
   

@@ -420,6 +420,19 @@ new_releases_combined <- new_album_tracks |>
             by = "album_id") |>
   mutate(charted_year = as.integer(substr(release_date, 1, 4)))
 
+new_releases_combined <- new_releases_combined %>%
+  mutate(
+    release_date = case_when(
+      release_date_precision == "year" ~ str_c(release_date, "-01-01"),
+      release_date_precision == "month" ~ str_c(release_date, "-01"),
+      TRUE ~ release_date
+    ),
+    release_date = as.Date(release_date)
+  )
+
+new_releases_combined <- new_releases_combined %>%
+  filter(year(release_date) == 2024)
+
 
 # Write the combined dataset for artists to a CSV file
 write_csv(combined_artists_tracks, "data/combined_artists_tracks_2018_2024.csv")
@@ -429,4 +442,7 @@ write_csv(combined_albums_tracks, "data/combined_albums_tracks_2018_2024.csv")
 
 # Write new releases dataset (most updated from Spotify)
 write_csv(new_releases_combined, "data/new_releases_combined.csv")
+
+# Data Prep -------------------------------------------------------------------
+
 
