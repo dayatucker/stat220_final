@@ -13,6 +13,14 @@ Repo for final project for Stat220
 Description
 - dataset 1 info
 
-### dataset 2
+### `combined_albums_tracks_2018_2024.csv`
 Description
 - dataset 2 info
+
+### `combined_artists_tracks_2018_2024.csv`
+Description
+- dataset 3 info
+
+### `new_releases_combined.csv`
+Description
+- dataset 4 info
