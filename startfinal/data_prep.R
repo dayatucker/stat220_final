@@ -423,8 +423,8 @@ new_releases_combined <- new_album_tracks |>
 new_releases_combined <- new_releases_combined %>%
   mutate(
     release_date = case_when(
-      release_date_precision == "year" ~ str_c(release_date, "-01-01"),
-      release_date_precision == "month" ~ str_c(release_date, "-01"),
+      release_date == "year" ~ str_c(release_date, "-01-01"),
+      release_date == "month" ~ str_c(release_date, "-01"),
       TRUE ~ release_date
     ),
     release_date = as.Date(release_date)
