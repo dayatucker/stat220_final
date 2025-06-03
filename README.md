@@ -9,7 +9,7 @@ Repo for final project for Stat220
 - `.txt` files: Delete later
 
 ## Datasets
-### dataset 1
+### `all_tracks_*.csv`
 Description
 - dataset 1 info
 
