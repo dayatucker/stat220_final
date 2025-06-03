@@ -100,7 +100,12 @@ ui <- fluidPage(
                    selected = selected_genres
                  )
                ),
-               mainPanel(plotlyOutput("genre_scatter"))
+               mainPanel(
+                 tabsetPanel(
+                   tabPanel("Bar Chart", plotlyOutput("genre_bar")),
+                   tabPanel("Track Table", DT::dataTableOutput("genre_table"))
+                 )
+               )
              )
     ),
     
@@ -391,14 +396,36 @@ server <- function(input, output, session) {
   })
   
   # Genre Tab
-  output$genre_scatter <- renderPlotly({
+  output$genre_bar <- renderPlotly({
     req(input$selected_genres)
-    df <- combined_artists_tracks |> separate_rows(genres, sep = ",\\s*") |> filter(genres %in% input$selected_genres) |>
-      mutate(charted_year = as.factor(charted_year), hover_text = str_c("Artist: ", artist_name, "\nTrack: ", track_name, "\nGenre: ", genres, "\nYear: ", charted_year))
-    p <- ggplot(df, aes(x = charted_year, y = genres, text = hover_text)) +
-      geom_jitter(alpha = 0.6, color = "#1ed760", width = 0.3, height = 0.2) +
-      labs(title = "Specific Genres by Year", x = "Year", y = "Specific Genre")
+    df <- combined_artists_tracks |>
+      separate_rows(genres, sep = ",\\s*") |>
+      filter(genres %in% input$selected_genres) |>
+      distinct(track_name, genres, charted_year) |>
+      count(genres, charted_year, name = "track_count") |>
+      mutate(charted_year = as.factor(charted_year))
+    p <- ggplot(df, aes(x = charted_year, y = track_count, fill = genres,
+                        text = paste("Genre:", genres, "\nYear:", charted_year, "\nCount:", track_count))) +
+      geom_col(position = "dodge") +
+      labs(title = "Number of Tracks per Genre by Year",
+           x = "Year", y = "Unique Track Count", fill = "Genre")
     ggplotly(p, tooltip = "text")
+  })
+  
+  output$genre_table <- DT::renderDataTable({
+    req(input$selected_genres)
+    combined_artists_tracks |>
+      separate_rows(genres, sep = ",\\s*") |>
+      filter(genres %in% input$selected_genres) |>
+      group_by(track_name, artist_name) |>
+      summarise(
+        genres = paste(unique(genres), collapse = ", "),
+        album_name = first(album_name),
+        popularity = max(popularity, na.rm = TRUE),
+        charted_years = paste(sort(unique(charted_year)), collapse = ", "),
+        .groups = "drop"
+      ) |>
+      arrange(desc(popularity))
   })
   
   # Years Since Release
