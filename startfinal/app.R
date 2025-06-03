@@ -28,15 +28,7 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  selectInput("selected_year", "Select Year:", choices = 2018:2024, selected = 2024),
-                 tags$iframe(
-                   src = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0", # Example Spotify playlist URL
-                   width = "100%", 
-                   height = "1000", 
-                   frameBorder = "0", 
-                   allowfullscreen = "", 
-                   allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
-                   loading = "lazy"
-                 )
+                 uiOutput("top_iframe")
                ),
                mainPanel(
                  h3("Top Artists"),
@@ -274,8 +266,29 @@ server <- function(input, output, session) {
       arrange(release_date)
   })
   
-  output$artist_table <- renderDT({ datatable(filtered_artists(), options = list(pageLength = 10), rownames = FALSE) })
+  output$artist_table <- renderDT({
+    datatable(filtered_artists(), options = list(pageLength = 10, selection = 'single'), rownames = FALSE)
+  })
   output$album_table  <- renderDT({ datatable(filtered_albums(),  options = list(pageLength = 10), rownames = FALSE) })
+  
+  output$top_iframe <- renderUI({
+    selected_row <- input$artist_table_rows_selected
+    if (length(selected_row)) {
+      selected_artist <- filtered_artists()[selected_row, "artist_name", drop = TRUE]
+      # Construct a Spotify artist URL (example: replace spaces with + for search)
+      artist_url <- str_c("https://open.spotify.com/embed/artist/", 
+                          URLencode(gsub(" ", "+", selected_artist)))
+      tags$iframe(src = artist_url, width = "100%", height = "352", frameBorder = "0", 
+                  allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
+                  loading = "lazy")
+    } else {
+      # Default iframe (e.g., a placeholder or the random song spotlight)
+      tags$iframe(src = "https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator", 
+                  width = "100%", height = "600", frameBorder = "0", allowfullscreen = "", 
+                  allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
+                  loading = "lazy")
+    }
+  })
   
   # Dynamic Track Selectors
   output$artist_selector <- renderUI({
