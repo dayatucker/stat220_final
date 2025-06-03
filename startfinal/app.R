@@ -14,7 +14,7 @@ combined_artists_tracks <- combined_artists_tracks %>%
 
 # UI ----
 ui <- fluidPage(
-  includeCSS("design/styles.css"),
+  includeCSS("www/styles.css"),
   
   titlePanel("Spotify Music Explorer 2018-2024"),
   

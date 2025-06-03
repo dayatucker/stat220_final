@@ -1,7 +1,18 @@
+@font-face {
+    font-family: 'SpotifyMix';
+    src: url('spotifymix.woff') format('woff'), url('spotifymix.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: 'SpotifyMix', Arial, sans-serif !important;
+}
+
 body {
     background-color:	#121212;
     color: #ffffff;
-    font-family: "Helvetica", sans-serif;
+
 }
 .nav-tabs li a {
     color: #ffffff;
