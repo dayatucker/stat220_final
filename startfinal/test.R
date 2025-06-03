@@ -207,6 +207,19 @@ server <- function(input, output, session) {
     
     link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator")
     
+    fire <- ""
+    
+    if (spotlight_song$popularity >= 80) {
+      fire <- "🔥"
+    }
+    if (spotlight_song$popularity >= 90) {
+      fire <- "🔥🔥"
+    }
+    if (spotlight_song$popularity >= 95) {
+      fire <- "🔥🔥🔥"
+    }
+    
+    
     tagList(
       tags$iframe(src=link, 
                   width="100%", 
