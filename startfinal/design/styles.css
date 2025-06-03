@@ -1,0 +1,7 @@
+body {
+    background-color:	#121212; /* Dark background */
+    color: #ffffff; /* White text */
+}
+.nav-tabs li a {
+    color: #1db954; /* Green tab text */
+}

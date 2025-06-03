@@ -14,6 +14,8 @@ combined_artists_tracks <- combined_artists_tracks %>%
 
 # UI ----
 ui <- fluidPage(
+  #includeCSS("design/styles.css"),
+  
   titlePanel("Spotify Music Explorer 2018-2024"),
   
   # Random Song Spotlight Section
@@ -191,9 +193,19 @@ server <- function(input, output, session) {
     
     spotlight_song <- combined_artists_tracks[sample(nrow(combined_artists_tracks), 1), ]
     
-    print(spotlight_song)
-    
     link <- str_c("https://open.spotify.com/embed/track/",spotlight_song$track_id,"?utm_source=generator")
+    
+    fire <- ""
+    
+    if (spotlight_song$popularity >= 80) {
+      fire <- "🔥"
+    }
+    if (spotlight_song$popularity >= 90) {
+      fire <- "🔥🔥"
+    }
+    if (spotlight_song$popularity >= 95) {
+      fire <- "🔥🔥🔥"
+    }
     
     tagList(
       tags$iframe(src=link, 
@@ -208,7 +220,7 @@ server <- function(input, output, session) {
               picture-in-picture", 
                   loading="lazy"),
       p(str_c("Year Released: ", as.integer(spotlight_song$release_year))),
-      p(str_c("Popularity: ", spotlight_song$popularity))
+      p(str_c("Popularity: ", spotlight_song$popularity, fire))
     )
   })
   
