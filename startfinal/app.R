@@ -171,9 +171,9 @@ ui <- fluidPage(
                               inputId = "release_date_range",
                               label = "Select Release Date Range:",
                               start = as.Date("2024-04-01"),
-                              end = as.Date("2024-04-30"),
+                              end = as.Date("2024-04-20"),
                               min = as.Date("2024-04-01"),
-                              max = as.Date("2024-04-30")
+                              max = as.Date("2024-04-20")
                             ),
                             helpText("Select a date range only within April 2024.")
                           ),
