@@ -169,33 +169,37 @@ ui <- fluidPage(
                             dateRangeInput(
                               inputId = "release_date_range",
                               label = "Select Release Date Range:",
-                              start = min(new_releases_combined$release_date, na.rm = TRUE),
-                              end = max(new_releases_combined$release_date, na.rm = TRUE),
-                              min = min(new_releases_combined$release_date, na.rm = TRUE),
-                              max = max(new_releases_combined$release_date, na.rm = TRUE)
-                            )
+                              start = as.Date("2024-04-01"),
+                              end = as.Date("2024-04-30"),
+                              min = as.Date("2024-04-01"),
+                              max = as.Date("2024-04-30")
+                            ),
+                            helpText("Select a date range only within April 2024.")
                           ),
-                          mainPanel(plotlyOutput("new_release_date_plot"))
+                          mainPanel(
+                            plotlyOutput("new_release_date_plot"),
+                            br(),
+                            plotlyOutput("weekday_avg_popularity_plot")
+                          )
                         )
                ),
-               tabPanel("By Album",
+               tabPanel("Weekday",
                         sidebarLayout(
                           sidebarPanel(
-                            checkboxGroupInput("selected_new_albums", "Select Album(s):",
-                                               choices = sort(unique(new_releases_combined$album_name)))
+                            selectInput(
+                              inputId = "selected_weekday",
+                              label = "Choose a Weekday:",
+                              choices = c("Monday", "Tuesday", "Wednesday", "Thursday", 
+                                          "Friday", "Saturday", "Sunday"),
+                              selected = "Friday"
+                            ),
+                            helpText("This plot shows tracks released on the selected weekday in April 2024.")
                           ),
-                          mainPanel(plotlyOutput("new_release_album_plot"))
+                          mainPanel(
+                            plotlyOutput("weekday_track_plot")
+                          )
                         )
                ),
-               tabPanel("By Track",
-                        sidebarLayout(
-                          sidebarPanel(
-                            checkboxGroupInput("selected_new_tracks", "Select Track(s):",
-                                               choices = sort(unique(new_releases_combined$track_name)))
-                          ),
-                          mainPanel(plotlyOutput("new_release_track_plot"))
-                        )
-               )
              )
     )
   )
@@ -453,6 +457,7 @@ server <- function(input, output, session) {
   
   # New Album Releases Tab Logic
   output$new_release_date_plot <- renderPlotly({
+    new_releases_combined$release_date <- as.Date(new_releases_combined$release_date)
     df <- new_releases_combined %>%
       filter(release_date >= input$release_date_range[1],
              release_date <= input$release_date_range[2])
@@ -473,32 +478,53 @@ server <- function(input, output, session) {
       theme_minimal() +
       scale_x_date(date_breaks = "1 day", date_labels = "%m-%d-%y") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    
     ggplotly(p, tooltip = "text")
   })
   
-  output$new_release_album_plot <- renderPlotly({
-    req(input$selected_new_albums)
-    df <- new_releases_combined %>% filter(album_name %in% input$selected_new_albums)
-    p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = album_name,
-                        text = paste("Track:", track_name, "\nPopularity:", popularity))) +
-      geom_bar(stat = "identity") + coord_flip() +
-      labs(title = "Popularity by Track (Selected Albums)", x = "Track Name", y = "Popularity", fill = "Album") +
-      theme_minimal()
-    ggplotly(p, tooltip = "text")
-  })
-  
-  output$new_release_track_plot <- renderPlotly({
-    req(input$selected_new_tracks)
+  output$weekday_avg_popularity_plot <- renderPlotly({
     df <- new_releases_combined %>%
-      filter(track_name %in% input$selected_new_tracks) %>%
-      mutate(duration_min = track_duration_ms / 60000)
-    p <- ggplot(df, aes(x = duration_min, y = popularity, text = paste("Track:", track_name, "\nDuration:", round(duration_min, 2), "min\nPopularity:", popularity))) +
-      geom_point(alpha = 0.7, color = "#1ed760") +
-      labs(title = "Popularity vs. Duration (Selected Tracks)", x = "Track Duration (Minutes)", y = "Popularity") +
+      filter(release_date >= input$release_date_range[1],
+             release_date <= input$release_date_range[2]) %>%
+      mutate(weekday = weekdays(release_date)) %>%
+      group_by(weekday) %>%
+      summarise(avg_popularity = round(mean(popularity, na.rm = TRUE))) %>%
+      mutate(weekday = factor(weekday, 
+                              levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
+                                         "Friday", "Saturday", "Sunday")))
+    p <- ggplot(df, aes(x = weekday, y = avg_popularity, fill = weekday,
+                        text = str_c(
+                          "Weekday: ", weekday,
+                          "\nAvgerage Popularity: ", avg_popularity
+                        ))) +
+      geom_col(show.legend = FALSE) +
+      labs(title = "Average Popularity by Weekday",
+           x = "Weekday", y = "Average Popularity") +
       theme_minimal()
     ggplotly(p, tooltip = "text")
   })
+  
+  output$weekday_track_plot <- renderPlotly({
+    df <- new_releases_combined %>%
+      filter(format(release_date, "%Y-%m") == "2024-04") %>%
+      mutate(weekday = weekdays(release_date)) %>%
+      filter(weekday == input$selected_weekday)
+    p <- ggplot(df, aes(
+      x = reorder(track_name, popularity), 
+      y = popularity,
+      text = paste("Track:", track_name,
+                   "<br>Artist:", track_artists,
+                   "<br>Date:", release_date)
+    )) +
+      geom_col(fill = "#1db954") +
+      coord_flip() +
+      labs(
+        title = paste("Track Popularity on", input$selected_weekday, "in April 2024"),
+        x = "Track Name", y = "Popularity"
+      ) +
+      theme_minimal()
+    ggplotly(p, tooltip = "text")
+  })
+
 }
 
 # Run App ----

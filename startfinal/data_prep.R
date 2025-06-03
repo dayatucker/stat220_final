@@ -430,9 +430,6 @@ new_releases_combined <- new_releases_combined %>%
     release_date = as.Date(release_date)
   )
 
-new_releases_combined <- new_releases_combined %>%
-  filter(year(release_date) == 2024)
-
 
 # Write the combined dataset for artists to a CSV file
 write_csv(combined_artists_tracks, "data/combined_artists_tracks_2018_2024.csv")
