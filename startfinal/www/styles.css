@@ -91,6 +91,12 @@ div.selectize-dropdown .option.active {
   background-color: #121212;
 }
 
+div.table.dataTable tbody tr.selected,
+div.table.dataTable tbody td.selected {
+  background-color: #1ed760 !important;
+  color: #121212;
+}
+
 .dataTables_filter input:focus {
   outline: none;
   border: 2px solid #1ed760 !important;
@@ -115,6 +121,11 @@ div.dataTables_length select option:hover {
 
 div.datatables {
   color: #ffffff;
+}
+
+.datatables select {
+  color: #121212;
+  background-color: #1ed760;
 }
 
 div.well {

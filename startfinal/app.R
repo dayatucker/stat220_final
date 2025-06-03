@@ -38,14 +38,28 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  selectInput("selected_year", "Select Year:", choices = 2018:2024, selected = 2024),
-                 uiOutput("top_iframe")
+                 conditionalPanel(
+                   condition = "input.top_selected == 'Top Artists'",
+                   uiOutput("top_artist_iframe")
+                 ),
+                 conditionalPanel(
+                   condition = "input.top_selected == 'Top Albums'",
+                   uiOutput("top_album_iframe")
+                 )
                ),
                mainPanel(
-                 h3("Top Artists"),
-                 DTOutput("artist_table"),
-                 br(),
-                 h3("Top Albums"),
-                 DTOutput("album_table")
+                 tabsetPanel(id = "top_selected",
+                             tabPanel("Top Artists",
+                                      h3("Top Artists"),
+                                      DTOutput("artist_table")
+                             ),
+                             tabPanel("Top Albums",
+                                      h3("Top Albums"),
+                                      DTOutput("album_table")
+                             )
+                 ),
+                 br()
+                 
                )
              )
     ),
@@ -259,6 +273,16 @@ server <- function(input, output, session) {
   })
   
   # Top Artists/Albums Logic
+  
+  filtered_artists_year <- reactive({
+    combined_artists_tracks %>%
+      filter(charted_year == input$selected_year) %>%
+      group_by(artist_name, genres, artist_id) %>%
+      summarise(avg_popularity = round(mean(popularity, na.rm = TRUE), 1),
+                total_tracks = n(), .groups = "drop") %>%
+      arrange(desc(avg_popularity))
+  })
+  
   filtered_artists <- reactive({
     combined_artists_tracks %>%
       filter(charted_year == input$selected_year) %>%
@@ -268,10 +292,21 @@ server <- function(input, output, session) {
       arrange(desc(avg_popularity))
   })
   
+  filtered_albums_year <- reactive({
+    combined_albums_tracks %>%
+      filter(charted_year == input$selected_year) %>%
+      group_by(album_name, album_type, album_id) %>%
+      summarise(total_tracks = max(total_tracks),
+                release_date = first(release_date),
+                avg_track_duration_sec = round(mean(track_duration_ms, na.rm = TRUE) / 1000, 1),
+                .groups = "drop") %>%
+      arrange(release_date)
+  })
+  
   filtered_albums <- reactive({
     combined_albums_tracks %>%
       filter(charted_year == input$selected_year) %>%
-      group_by(album_name, album_type) %>%
+      group_by(album_name) %>%
       summarise(total_tracks = max(total_tracks),
                 release_date = first(release_date),
                 avg_track_duration_sec = round(mean(track_duration_ms, na.rm = TRUE) / 1000, 1),
@@ -280,23 +315,48 @@ server <- function(input, output, session) {
   })
   
   output$artist_table <- renderDT({
-    datatable(filtered_artists(), options = list(pageLength = 10, selection = 'single'), rownames = FALSE)
+    datatable(
+      filtered_artists(), 
+      options = list(pageLength = 10), 
+      selection = 'single', 
+      rownames = FALSE)
   })
-  output$album_table  <- renderDT({ datatable(filtered_albums(),  options = list(pageLength = 10), rownames = FALSE) })
   
-  output$top_iframe <- renderUI({
+  output$album_table  <- renderDT({
+    datatable(
+      filtered_albums(),  
+      options = list(pageLength = 10), 
+      selection = 'single', 
+      rownames = FALSE) 
+  })
+  
+  output$top_artist_iframe <- renderUI({
     selected_row <- input$artist_table_rows_selected
     if (length(selected_row)) {
-      selected_artist <- combined_artists_tracks[selected_row, "artist_id", drop = TRUE]
+      selected_artist <- filtered_artists_year()[selected_row, "artist_id", drop = TRUE]
       # Construct a Spotify artist URL (example: replace spaces with + for search)
-      artist_url <- str_c("https://open.spotify.com/embed/artist/", 
-                          URLencode(gsub(" ", "+", selected_artist)))
+      artist_url <- str_c("https://open.spotify.com/embed/artist/", selected_artist)
       tags$iframe(src = artist_url, width = "100%", height = "600", frameBorder = "0", 
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
                   loading = "lazy")
     } else {
       # Placeholder instructions
-      p(str_c("Select a row from the table to the right to view the artist's top hits or the album's tracks"))
+      p(str_c("Select a row from the table to the right to view the artist's top tracks"))
+    }
+  })
+  
+  output$top_album_iframe <- renderUI({
+    selected_row <- input$album_table_rows_selected
+    if (length(selected_row)) {
+      selected_album <- filtered_albums_year()[selected_row, "album_id", drop = TRUE]
+      # Construct a Spotify artist URL (example: replace spaces with + for search)
+      album_url <- str_c("https://open.spotify.com/embed/album/", selected_album)
+      tags$iframe(src = album_url, width = "100%", height = "600", frameBorder = "0", 
+                  allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
+                  loading = "lazy")
+    } else {
+      # Placeholder instructions
+      p(str_c("Select a row from the table to the right to view the songs on the album"))
     }
   })
   
