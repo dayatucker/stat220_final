@@ -198,7 +198,7 @@ ui <- fluidPage(
     # New Album Releases Tab
     tabPanel("New Album Releases 2024",
              tabsetPanel(
-               tabPanel("By Date",
+               tabPanel("Date of Album Release",
                         sidebarLayout(
                           sidebarPanel(
                             dateRangeInput(
