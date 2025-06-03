@@ -512,16 +512,16 @@ server <- function(input, output, session) {
       x = reorder(album_name, popularity), 
       y = popularity,
       text = paste("Album:", album_name,
-                   "<br>Artist:", track_artists,
-                   "<br>Date:", release_date)
+                   "\nArtist:", track_artists,
+                   "\nDate:", release_date)
     )) +
       geom_col(fill = "#1db954") +
-      coord_flip() +
       labs(
-        title = paste("Album Popularity on", input$selected_weekday, "in April 2024"),
+        title = str_c("Album Popularity on ", input$selected_weekday, " in April 2024"),
         x = "Album Name", y = "Popularity"
       ) +
-      theme_minimal()
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p, tooltip = "text")
   })
 
