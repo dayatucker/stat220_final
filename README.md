@@ -9,18 +9,18 @@ Repo for final project for Stat220
 - `.txt` files: Delete later
 
 ## Datasets
-### `all_tracks_*.csv`
+#### `all_tracks_*.csv`
 Description
 - dataset 1 info
 
-### `combined_albums_tracks_2018_2024.csv`
+#### `combined_albums_tracks_2018_2024.csv`
 Description
 - dataset 2 info
 
-### `combined_artists_tracks_2018_2024.csv`
+#### `combined_artists_tracks_2018_2024.csv`
 Description
 - dataset 3 info
 
-### `new_releases_combined.csv`
+#### `new_releases_combined.csv`
 Description
 - dataset 4 info
