@@ -4,6 +4,7 @@ library(httr2)
 library(httr)
 library(stringr)
 library(scales)
+library(purrr)
 
 
 # API Setup + Token
@@ -296,6 +297,15 @@ get_album_tracks <- function(album_id, token) {
   })
 }
 
+get_track_popularity <- function(track_id, token) {
+  url <- paste0("https://api.spotify.com/v1/tracks/", track_id)
+  req <- request(url) |>
+    req_headers(Authorization = paste("Bearer", token))
+  resp <- req_perform(req)
+  content <- resp_body_json(resp, simplifyVector = FALSE)
+  
+  return(content$popularity)
+}
 
 # For loop for creating album_data, album_track_data, and combined_data for years 2018 to 2024
 
@@ -329,6 +339,16 @@ for (year in years) {
   assign(
     str_c("combined_", year),
     get(str_c("combined_", year)) %>% mutate(charted_year = year)
+  )
+  
+  # Add Popularity score for each song via track_id
+  assign(
+    str_c("combined_", year), 
+    get(str_c("combined_", year)) %>% 
+      mutate(track_popularity = map_dbl(track_id, ~ {
+        Sys.sleep(0.1)
+        get_track_popularity(.x, token)
+      }))
   )
 }
 
@@ -380,27 +400,28 @@ get_all_new_releases <- function(token, country = "US", max_albums = 100) {
   }) |> head(max_albums)
 }
 
-years <- 2018:2024
+# years <- 2018:2024
+# 
+# for (year in years) {
+#   album_ids <- get(str_c("album_ids_", year))
+#   
+#   assign(str_c("album_data_", year), get_album_data(album_ids, token))
+#   
+#   assign(str_c("album_tracks_", year),
+#          map_dfr(album_ids, get_album_tracks, token = token))
+#   
+#   combined_df <- left_join(
+#     get(str_c("album_data_", year)),
+#     get(str_c("album_tracks_", year)),
+#     by = "album_id"
+#   )
+#   
+#   combined_df <- combined_df %>%
+#     mutate(charted_year = as.integer(substr(release_date, 1, 4)))
+#   
+#   assign(str_c("combined_", year), combined_df)
+# }
 
-for (year in years) {
-  album_ids <- get(str_c("album_ids_", year))
-  
-  assign(str_c("album_data_", year), get_album_data(album_ids, token))
-  
-  assign(str_c("album_tracks_", year),
-         map_dfr(album_ids, get_album_tracks, token = token))
-  
-  combined_df <- left_join(
-    get(str_c("album_data_", year)),
-    get(str_c("album_tracks_", year)),
-    by = "album_id"
-  )
-  
-  combined_df <- combined_df %>%
-    mutate(charted_year = as.integer(substr(release_date, 1, 4)))
-  
-  assign(str_c("combined_", year), combined_df)
-}
 
 
 # Get latest new releases

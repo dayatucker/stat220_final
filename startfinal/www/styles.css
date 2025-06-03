@@ -83,6 +83,15 @@ div.selectize-dropdown .option.active {
   color: #121212 !important;
 }
 
+div.datatables {
+  color: #ffffff;
+}
+
+.dataTable tbody tr.odd.selected {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
 .dataTable tbody tr:nth-child(odd) {
   background-color: #212121;
 }
@@ -91,11 +100,7 @@ div.selectize-dropdown .option.active {
   background-color: #121212;
 }
 
-div.table.dataTable tbody tr.selected,
-div.table.dataTable tbody td.selected {
-  background-color: #1ed760 !important;
-  color: #121212;
-}
+
 
 .dataTables_filter input:focus {
   outline: none;
@@ -117,15 +122,6 @@ div.dataTables_length select option {
 div.dataTables_length select option:hover {
   background-color: #1ed760 !important;
   color: #121212 !important;
-}
-
-div.datatables {
-  color: #ffffff;
-}
-
-.datatables select {
-  color: #121212;
-  background-color: #1ed760;
 }
 
 div.well {
