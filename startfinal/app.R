@@ -1,9 +1,9 @@
 library(shiny)
+library(shinyjs)
 library(tidyverse)
 library(DT)
 library(plotly)
 library(tidytext)
-library(shinyjs)
 
 # Load Data ----
 combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv")
@@ -30,28 +30,51 @@ ui <- fluidPage(
   
   tags$head(
     tags$style(HTML("
-      #sidebar {
-        width: 250px;
-        background: #f8f9fa;
-        position: fixed;
-        height: 100%;
-        overflow-y: auto;
-        padding: 10px;
-        border-right: 1px solid #ddd;
-        display: block;
-        transition: all 0.3s ease;
-      }
-      #sidebar.hidden {
-        margin-left: -260px;
-      }
-      #content {
-        margin-left: 260px;
-        transition: all 0.3s ease;
-      }
-      #content.fullwidth {
-        margin-left: 0;
-      }
-      "))
+    body {
+      background-color: #111;
+      color: white;
+    }
+
+    #sidebar {
+      width: 250px;
+      background: #000000;
+      color: white;
+      position: fixed;
+      height: 100%;
+      overflow-y: auto;
+      padding: 10px;
+      border-right: 1px solid #333;
+      display: block;
+      transition: all 0.3s ease;
+    }
+
+    #sidebar.hidden {
+      margin-left: -260px;
+    }
+
+    #content {
+      margin-left: 260px;
+      transition: all 0.3s ease;
+    }
+
+    #content.fullwidth {
+      margin-left: 0;
+    }
+
+    /* Radio buttons white text */
+    .radio label {
+      color: white;
+    }
+
+    /* Toggle button style */
+    #toggleSidebar {
+      background-color: transparent;
+      border: none;
+      font-size: 40px;
+      cursor: pointer;
+      color: white;
+    }
+  "))
   ),
   
   # Menu
@@ -272,8 +295,7 @@ server <- function(input, output, session) {
                       fluidPage(
                         sidebarLayout(
                           sidebarPanel(
-                            checkboxGroupInput("selected_words", "Select Words to Display:",
-                                               choices = NULL, selected = NULL),
+                            uiOutput("word_selector_ui"),
                             helpText("Words are colored by sentiment (positive/negative)")
                           ),
                           mainPanel(
@@ -325,6 +347,7 @@ server <- function(input, output, session) {
     )
   })
   
+# Server ----
   # Pick a random song when the app loads
   output$song_spotlight <- renderUI({
     
@@ -700,6 +723,16 @@ server <- function(input, output, session) {
     updateCheckboxGroupInput(inputId = "selected_words",
                              choices = words,
                              selected = words)
+  })
+  
+  output$word_selector_ui <- renderUI({
+    words <- top_words_sentiment()$top_words$word
+    checkboxGroupInput(
+      inputId = "selected_words",
+      label = "Select Words to Display:",
+      choices = words,
+      selected = words
+    )
   })
   
   # Render the sentiment plot
