@@ -3,6 +3,7 @@ library(tidyverse)
 library(DT)
 library(plotly)
 library(tidytext)
+library(shinyjs)
 
 # Load Data ----
 combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv")
@@ -59,10 +60,16 @@ ui <- fluidPage(
   
   div(id = "sidebar",
       h3("Menu"),
-      tags$ul(
-        tags$li("Tab 1"),
-        tags$li("Tab 2"),
-        tags$li("Tab 3")
+      radioButtons("nav", NULL, choices = c(
+        "Top Artists/Albums" = "artists",
+        "Top Tracks" = "tracks",
+        "Track Genre" = "genre",
+        "Years Since Release" = "years",
+        "Track Duration" = "duration",
+        "Number of Tracks in an Album" = "track_count",
+        "Tracks with Features" = "features",
+        "Most Common Words" = "words",
+        "New Releases" = "new_releases")
       )
   ),
   
@@ -76,224 +83,7 @@ ui <- fluidPage(
         h3("🎵Random Song Spotlight🎵"),
         uiOutput("song_spotlight"),
         
-        tabsetPanel(
-          # Top Artists/Albums Tab
-          tabPanel("Top Artists/Albums",
-                   sidebarLayout(
-                     sidebarPanel(
-                       selectInput("selected_year", "Select Year:", choices = 2018:2024, selected = 2024),
-                       helpText("View top charting artists and albums by year."),
-                       conditionalPanel(
-                         condition = "input.top_selected == 'Top Artists'",
-                         uiOutput("top_artist_iframe")
-                       ),
-                       conditionalPanel(
-                         condition = "input.top_selected == 'Top Albums'",
-                         uiOutput("top_album_iframe")
-                       )
-                     ),
-                     mainPanel(
-                       br(),
-                       tabsetPanel(id = "top_selected",
-                                   tabPanel("Top Artists",
-                                            h3("Top Artists"),
-                                            DTOutput("artist_table")
-                                   ),
-                                   tabPanel("Top Albums",
-                                            h3("Top Albums"),
-                                            DTOutput("album_table")
-                                   )
-                       ),
-                       br()
-                       
-                     )
-                   )
-          ),
-          
-          # Top Tracks Tab
-          tabPanel("Top Tracks",
-                   sidebarLayout(
-                     sidebarPanel(
-                       selectInput("track_year", "Select Year:", choices = 2018:2024, selected = 2024),
-                       helpText("Explore top tracks by artist or album for a selected year."),
-                       conditionalPanel(
-                         condition = "input.track_tab_selected == 'By Artist'",
-                         uiOutput("artist_selector"),
-                         uiOutput("artist_tracks_iframe")
-                         
-                       ),
-                       conditionalPanel(
-                         condition = "input.track_tab_selected == 'By Album'",
-                         uiOutput("album_selector"),
-                         uiOutput("album_tracks_iframe")
-                       )
-                     ),
-                     mainPanel(
-                       br(),
-                       tabsetPanel(id = "track_tab_selected",
-                                   tabPanel("By Artist", plotlyOutput("artist_tracks_plot")),
-                                   tabPanel("By Album", plotlyOutput("album_tracks_plot"))
-                       )
-                     )
-                   )
-          ),
-          
-          # Track Genre Tab
-          tabPanel("Track Genre",
-                   sidebarLayout(
-                     sidebarPanel(
-                       checkboxGroupInput(
-                         inputId = "selected_genres",
-                         label = "Select Genres:",
-                         choices = genre_choices,
-                         selected = selected_genres
-                       ),
-                       helpText("Select one or more genres to compare track or album counts by year.")
-                     ),
-                     mainPanel(
-                       br(),
-                       tabsetPanel(
-                         tabPanel("Bar Chart", plotlyOutput("genre_bar")),
-                         tabPanel("Track Table", DT::dataTableOutput("genre_table"))
-                       )
-                     )
-                   )
-          ),
-          
-          # Years Since Release Tab
-          tabPanel("Years Since Release",
-                   sidebarLayout(
-                     sidebarPanel(
-                       sliderInput(
-                         "years_range",
-                         "Select Years Since Release Range:",
-                         min = floor(min(combined_artists_tracks$years_since_release, na.rm = TRUE)),
-                         max = ceiling(max(combined_artists_tracks$years_since_release, na.rm = TRUE)),
-                         value = c(
-                           floor(min(combined_artists_tracks$years_since_release, na.rm = TRUE)),
-                           ceiling(max(combined_artists_tracks$years_since_release, na.rm = TRUE))
-                         ),
-                         step = 1
-                       ),
-                       helpText("Negative values indicate tracks released after the charting year (e.g. pre-releases or delayed data).")
-                     ),
-                     mainPanel(
-                       br(),
-                       plotlyOutput("years_release_plot", height = "600px")
-                     )
-                   )
-          ),
-          
-          # Track Duration Tab
-          tabPanel("Track Duration",
-                   sidebarLayout(
-                     sidebarPanel(
-                       sliderInput("duration_range", "Select Track Duration (Minutes):",
-                                   min = 0, max = 10, value = c(2, 5), step = 0.1),
-                       helpText("Use the slider to filter tracks by duration in minutes."),
-                       conditionalPanel(
-                         condition = "input.duration_tab_selected == 'By Artist'",
-                         uiOutput("duration_artist_selector")
-                       ),
-                       conditionalPanel(
-                         condition = "input.duration_tab_selected == 'By Album'",
-                         uiOutput("duration_album_selector")
-                       )
-                     ),
-                     mainPanel(
-                       br(),
-                       tabsetPanel(id = "duration_tab_selected",
-                                   tabPanel("By Artist", plotlyOutput("duration_artist_plot")),
-                                   tabPanel("By Album", plotlyOutput("duration_album_plot"))
-                       )
-                     )
-                   )
-          ),
-          
-          # Number of Tracks in an Album Tab
-          tabPanel("Number of Tracks in an Album",
-                   sidebarLayout(
-                     sidebarPanel(
-                       selectInput("tracks_year", "Select Charted Year:", 
-                                   choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
-                       helpText("Select a year to see how many tracks albums had in that charting year.")
-                     ),
-                     mainPanel(
-                       br(),
-                       plotlyOutput("album_tracks_count_plot")
-                     )
-                   )
-          ),
-          
-          # Tracks with Features Tab
-          tabPanel("Tracks with Features",
-                   sidebarLayout(
-                     sidebarPanel(
-                       selectInput("features_year", "Select Charted Year:", 
-                                   choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
-                       uiOutput("features_album_selector"),
-                       helpText("Explore collaborations and featured artists for selected albums.")
-                     ),
-                     mainPanel(
-                       br(),
-                       plotlyOutput("featured_tracks_plot"))
-                   )
-          ),
-          
-          # Most Common Words in Track Names
-          tabPanel("Most Common Words in Track Names",
-                   fluidPage(
-                     sidebarLayout(
-                       sidebarPanel(
-                         checkboxGroupInput("selected_words", "Select Words to Display:",
-                                            choices = NULL, selected = NULL),
-                         helpText("Words are colored by sentiment (positive/negative)")
-                       ),
-                       mainPanel(
-                         br(),
-                         plotlyOutput("word_trend_plot")
-                       )
-                     )
-                   )
-          ),
-          
-          # New Album Releases Tab
-          tabPanel("New Album Releases 2024",
-                   br(),
-                   tabsetPanel(
-                     tabPanel("Date of Album Release",
-                              sidebarLayout(
-                                sidebarPanel(
-                                  dateRangeInput(
-                                    inputId = "release_date_range",
-                                    label = "Select Release Date Range:",
-                                    start = as.Date("2024-04-01"),
-                                    end = as.Date("2024-04-20"),
-                                    min = as.Date("2024-04-01"),
-                                    max = as.Date("2024-04-20")
-                                  ),
-                                  helpText("Select a date range only within April 2024.")
-                                ),
-                                mainPanel(
-                                  br(),
-                                  plotlyOutput("new_release_date_plot")
-                                )
-                              )
-                     ),
-                     tabPanel("Weekday of Album Release",
-                              sidebarLayout(
-                                sidebarPanel(
-                                  helpText("This plot shows how many tracks were released on each weekday in April 2024.")
-                                ),
-                                mainPanel(
-                                  br(),
-                                  plotlyOutput("weekday_track_count_plot")
-                                )
-                              )
-                     )
-                   )
-          )
-        )
+        uiOutput("main_content")
       )))
 
 # Server ----
@@ -302,6 +92,237 @@ server <- function(input, output, session) {
   observeEvent(input$toggleSidebar, {
     shinyjs::toggleClass("sidebar", "hidden")
     shinyjs::toggleClass("content", "fullwidth")
+  })
+  
+  output$main_content <- renderUI({
+    switch(input$nav,
+           "artists" = {
+             # Top Artists/Albums Tab
+             tabPanel("Top Artists/Albums",
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("selected_year", "Select Year:", choices = 2018:2024, selected = 2024),
+                          helpText("View top charting artists and albums by year."),
+                          conditionalPanel(
+                            condition = "input.top_selected == 'Top Artists'",
+                            uiOutput("top_artist_iframe")
+                          ),
+                          conditionalPanel(
+                            condition = "input.top_selected == 'Top Albums'",
+                            uiOutput("top_album_iframe")
+                          )
+                        ),
+                        mainPanel(
+                          br(),
+                          tabsetPanel(id = "top_selected",
+                                      tabPanel("Top Artists",
+                                               h3("Top Artists"),
+                                               DTOutput("artist_table")
+                                      ),
+                                      tabPanel("Top Albums",
+                                               h3("Top Albums"),
+                                               DTOutput("album_table")
+                                      )
+                          ),
+                          br()
+                          
+                        )
+                      )
+             )
+           },
+           "tracks" = {
+             # Top Tracks Tab
+             tabPanel("Top Tracks",
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("track_year", "Select Year:", choices = 2018:2024, selected = 2024),
+                          helpText("Explore top tracks by artist or album for a selected year."),
+                          conditionalPanel(
+                            condition = "input.track_tab_selected == 'By Artist'",
+                            uiOutput("artist_selector"),
+                            uiOutput("artist_tracks_iframe")
+                            
+                          ),
+                          conditionalPanel(
+                            condition = "input.track_tab_selected == 'By Album'",
+                            uiOutput("album_selector"),
+                            uiOutput("album_tracks_iframe")
+                          )
+                        ),
+                        mainPanel(
+                          br(),
+                          tabsetPanel(id = "track_tab_selected",
+                                      tabPanel("By Artist", plotlyOutput("artist_tracks_plot")),
+                                      tabPanel("By Album", plotlyOutput("album_tracks_plot"))
+                          )
+                        )
+                      )
+             )
+           },
+           "genre" = {
+             # Track Genre Tab
+             tabPanel("Track Genre",
+                      sidebarLayout(
+                        sidebarPanel(
+                          checkboxGroupInput(
+                            inputId = "selected_genres",
+                            label = "Select Genres:",
+                            choices = genre_choices,
+                            selected = selected_genres
+                          ),
+                          helpText("Select one or more genres to compare track or album counts by year.")
+                        ),
+                        mainPanel(
+                          br(),
+                          tabsetPanel(
+                            tabPanel("Bar Chart", plotlyOutput("genre_bar")),
+                            tabPanel("Track Table", DT::dataTableOutput("genre_table"))
+                          )
+                        )
+                      )
+             )
+           },
+           "years" = {
+             # Years Since Release Tab
+             tabPanel("Years Since Release",
+                      sidebarLayout(
+                        sidebarPanel(
+                          sliderInput(
+                            "years_range",
+                            "Select Years Since Release Range:",
+                            min = floor(min(combined_artists_tracks$years_since_release, na.rm = TRUE)),
+                            max = ceiling(max(combined_artists_tracks$years_since_release, na.rm = TRUE)),
+                            value = c(
+                              floor(min(combined_artists_tracks$years_since_release, na.rm = TRUE)),
+                              ceiling(max(combined_artists_tracks$years_since_release, na.rm = TRUE))
+                            ),
+                            step = 1
+                          ),
+                          helpText("Negative values indicate tracks released after the charting year (e.g. pre-releases or delayed data).")
+                        ),
+                        mainPanel(
+                          br(),
+                          plotlyOutput("years_release_plot", height = "600px")
+                        )
+                      )
+             )
+           },
+           "duration" = {
+             # Track Duration Tab
+             tabPanel("Track Duration",
+                      sidebarLayout(
+                        sidebarPanel(
+                          sliderInput("duration_range", "Select Track Duration (Minutes):",
+                                      min = 0, max = 10, value = c(2, 5), step = 0.1),
+                          helpText("Use the slider to filter tracks by duration in minutes."),
+                          conditionalPanel(
+                            condition = "input.duration_tab_selected == 'By Artist'",
+                            uiOutput("duration_artist_selector")
+                          ),
+                          conditionalPanel(
+                            condition = "input.duration_tab_selected == 'By Album'",
+                            uiOutput("duration_album_selector")
+                          )
+                        ),
+                        mainPanel(
+                          br(),
+                          tabsetPanel(id = "duration_tab_selected",
+                                      tabPanel("By Artist", plotlyOutput("duration_artist_plot")),
+                                      tabPanel("By Album", plotlyOutput("duration_album_plot"))
+                          )
+                        )
+                      )
+             )
+           },
+           "track_count" = {
+             # Number of Tracks in an Album Tab
+             tabPanel("Number of Tracks in an Album",
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("tracks_year", "Select Charted Year:", 
+                                      choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
+                          helpText("Select a year to see how many tracks albums had in that charting year.")
+                        ),
+                        mainPanel(
+                          br(),
+                          plotlyOutput("album_tracks_count_plot")
+                        )
+                      )
+             )
+           },
+           "features" = {
+             # Tracks with Features Tab
+             tabPanel("Tracks with Features",
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("features_year", "Select Charted Year:", 
+                                      choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
+                          uiOutput("features_album_selector"),
+                          helpText("Explore collaborations and featured artists for selected albums.")
+                        ),
+                        mainPanel(
+                          br(),
+                          plotlyOutput("featured_tracks_plot"))
+                      )
+             )
+           },
+           "words" = {
+             # Most Common Words in Track Names
+             tabPanel("Most Common Words in Track Names",
+                      fluidPage(
+                        sidebarLayout(
+                          sidebarPanel(
+                            checkboxGroupInput("selected_words", "Select Words to Display:",
+                                               choices = NULL, selected = NULL),
+                            helpText("Words are colored by sentiment (positive/negative)")
+                          ),
+                          mainPanel(
+                            br(),
+                            plotlyOutput("word_trend_plot")
+                          )
+                        )
+                      )
+             )
+           },
+           "new_releases" = {
+             # New Album Releases Tab
+             tabPanel("New Album Releases 2024",
+                      br(),
+                      tabsetPanel(
+                        tabPanel("Date of Album Release",
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                     dateRangeInput(
+                                       inputId = "release_date_range",
+                                       label = "Select Release Date Range:",
+                                       start = as.Date("2024-04-01"),
+                                       end = as.Date("2024-04-20"),
+                                       min = as.Date("2024-04-01"),
+                                       max = as.Date("2024-04-20")
+                                     ),
+                                     helpText("Select a date range only within April 2024.")
+                                   ),
+                                   mainPanel(
+                                     br(),
+                                     plotlyOutput("new_release_date_plot")
+                                   )
+                                 )
+                        ),
+                        tabPanel("Weekday of Album Release",
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                     helpText("This plot shows how many tracks were released on each weekday in April 2024.")
+                                   ),
+                                   mainPanel(
+                                     br(),
+                                     plotlyOutput("weekday_track_count_plot")
+                                   )
+                                 )
+                        )
+                      )
+             )
+           }
+    )
   })
   
   # Pick a random song when the app loads
@@ -469,11 +490,11 @@ server <- function(input, output, session) {
     df <- combined_artists_tracks |>
       filter(charted_year == input$track_year, artist_name == input$selected_artist)
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(explicit),
-                text = str_c(
-                  "Track: ", track_name,
-                  "\nPopularity: ", popularity,
-                  "\nExplicit: ", ifelse(explicit, "Yes", "No")
-                ))) +
+                        text = str_c(
+                          "Track: ", track_name,
+                          "\nPopularity: ", popularity,
+                          "\nExplicit: ", ifelse(explicit, "Yes", "No")
+                        ))) +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#191414")) +
       labs(title = str_c("Tracks by ", input$selected_artist),
@@ -753,7 +774,7 @@ server <- function(input, output, session) {
         x = "Weekday", y = "Number of Tracks")
     ggplotly(p, tooltip = "text")
   })
-
+  
 }
 
 # Run App ----
