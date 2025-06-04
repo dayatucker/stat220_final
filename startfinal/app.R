@@ -385,8 +385,7 @@ server <- function(input, output, session) {
     )
   })
   
-  # Top Artists/Albums Logic
-  
+# Top Artists/Albums Logic
   filtered_artists_year <- reactive({
     combined_artists_tracks |>
       filter(charted_year == input$selected_year) |>
@@ -447,7 +446,7 @@ server <- function(input, output, session) {
     selected_row <- input$artist_table_rows_selected
     if (length(selected_row)) {
       selected_artist <- filtered_artists_year()[selected_row, "artist_id", drop = TRUE]
-      # Construct a Spotify artist URL (example: replace spaces with + for search)
+      # Spotify artist URL (example: replace spaces with + for search)
       artist_url <- str_c("https://open.spotify.com/embed/artist/", selected_artist)
       tags$iframe(src = artist_url, width = "100%", height = "500", frameBorder = "0", 
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
@@ -461,7 +460,7 @@ server <- function(input, output, session) {
     selected_row <- input$album_table_rows_selected
     if (length(selected_row)) {
       selected_album <- filtered_albums_year()[selected_row, "album_id", drop = TRUE]
-      # Construct a Spotify artist URL (example: replace spaces with + for search)
+      # Spotify artist URL (example: replace spaces with + for search)
       album_url <- str_c("https://open.spotify.com/embed/album/", selected_album)
       tags$iframe(src = album_url, width = "100%", height = "500", frameBorder = "0", 
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
@@ -472,7 +471,7 @@ server <- function(input, output, session) {
     }
   })
   
-  # Dynamic Track Selectors
+# Dynamic Track Selectors
   output$artist_selector <- renderUI({
     choices <- combined_artists_tracks |> filter(charted_year == input$track_year) |> distinct(artist_name) |> arrange(artist_name)
     selectInput("selected_artist", "Select Artist:", choices = choices$artist_name)
@@ -507,7 +506,7 @@ server <- function(input, output, session) {
                 loading = "lazy")
   })
   
-  # Top Artist/Album Tracks
+# Top Artist/Album Tracks
   output$artist_tracks_plot <- renderPlotly({
     req(input$selected_artist)
     df <- combined_artists_tracks |>
@@ -544,7 +543,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-  # Genre Tab
+# Genre Tab
   output$genre_bar <- renderPlotly({
     req(input$selected_genres)
     df <- combined_artists_tracks |>
@@ -577,7 +576,7 @@ server <- function(input, output, session) {
       arrange(desc(popularity))
   })
   
-  # Years Since Release
+# Years Since Release
   output$years_release_plot <- renderPlotly({
     df <- combined_artists_tracks |>
       filter(!is.na(years_since_release),
@@ -595,7 +594,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-  # Track Duration
+# Track Duration
   output$duration_artist_selector <- renderUI({
     selectInput("duration_artist", "Select Artist:",
                 choices = c("All", sort(unique(combined_artists_tracks$artist_name))),
@@ -657,7 +656,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-  # Number of Tracks in Album
+# Number of Tracks in Album
   output$album_tracks_count_plot <- renderPlotly({
     req(input$tracks_year)
     album_counts <- combined_albums_tracks |>
@@ -673,7 +672,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-  # Tracks with Features Tab
+# Tracks with Features Tab
   output$features_album_selector <- renderUI({
     choices <- combined_albums_tracks |> filter(charted_year == input$features_year) |> distinct(album_name) |> arrange(album_name)
     selectInput("features_album", "Select Album:", choices = choices$album_name)
@@ -693,24 +692,27 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-  # Most Common Words in Track Names
+# Most Common Words in Track Names
   # Load sentiment lexicon
   bing_sentiments <- get_sentiments("bing")
   
-  # Reactive expression to get top 10 words with sentiment
   top_words_sentiment <- reactive({
-    
-    word_data <- combined_albums_tracks |>
-      unnest_tokens(word, track_name) |>
+    # Ensure unique track names within each year
+    unique_tracks <- combined_albums_tracks |>
       filter(!is.na(charted_year)) |>
+      distinct(charted_year, track_name)  # distinct per year
+    
+    # Tokenize words from track names
+    word_data <- unique_tracks |>
+      unnest_tokens(word, track_name) |>
       anti_join(stop_words, by = "word") |>
       count(charted_year, word, sort = TRUE)
     
-    # Top 10 overall
+    # Get overall top 10 words across all years
     top_words <- word_data |>
       group_by(word) |>
       summarise(total = sum(n), .groups = "drop") |>
-      top_n(10, total) |>
+      slice_max(order_by = total, n = 10) |>
       left_join(bing_sentiments, by = "word") |>
       mutate(sentiment = replace_na(sentiment, "neutral"))
     
@@ -761,7 +763,7 @@ server <- function(input, output, session) {
     ggplotly(p)
   })
   
-  # New Album Releases Tab Logic
+# New Album Releases Tab Logic
   output$new_release_date_plot <- renderPlotly({
     new_releases_combined$release_date <- as.Date(new_releases_combined$release_date)
     df <- new_releases_combined |>
