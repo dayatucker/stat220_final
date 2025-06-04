@@ -685,7 +685,7 @@ server <- function(input, output, session) {
       mutate(has_feature = str_detect(tolower(track_name), "feat\\.|with"),
              feature_label = ifelse(has_feature, "With Feature", "No Feature"))
     p <- ggplot(df, aes(x = reorder(track_name, track_popularity), y = track_popularity, fill = feature_label,
-                        text = str_c("Track: ", track_name, "\nPopularity: ", track_popularity, "\nFeature: ", feature_label))) +
+                        text = str_c("Track: ", track_name, "\nArtist Name: ", track_artists, "\nPopularity: ", track_popularity, "\nFeature: ", feature_label))) +
       geom_bar(stat = "identity") +
       coord_flip() +
       labs(title = paste("Tracks from", input$features_album), x = "Track Name", y = "Popularity", fill = "Has Feature")
