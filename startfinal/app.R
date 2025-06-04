@@ -211,6 +211,7 @@ ui <- fluidPage(
     
     # New Album Releases Tab
     tabPanel("New Album Releases 2024",
+             br(),
              tabsetPanel(
                tabPanel("Date of Album Release",
                         sidebarLayout(
@@ -427,7 +428,7 @@ server <- function(input, output, session) {
     df <- combined_albums_tracks |>
       filter(charted_year == input$track_year, album_name == input$selected_album)
     
-    p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(track_explicit))) +
+    p <- ggplot(df, aes(x = reorder(track_name, track_popularity), y = track_popularity, fill = as.factor(track_explicit))) +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#191414")) +
       labs(title = str_c("Tracks from Album: ", input$selected_album),
