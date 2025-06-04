@@ -74,6 +74,41 @@ ui <- fluidPage(
       cursor: pointer;
       color: white;
     }
+    
+    /* Radio button container */
+    #sidebar .radio {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    #sidebar .radio input[type='radio'] {
+      display: none;
+    }
+    
+    #sidebar .radio label {
+      display: block;
+      background-color: #222;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid #444;
+      font-size: 15px;
+    }
+
+    #sidebar .radio label:hover {
+      background-color: #333;
+    }
+
+    #sidebar .radio input[type='radio']:checked + label {
+      background-color: #007bff;
+      color: white;
+      font-weight: 500;
+      border-color: #007bff;
+    }
+
   "))
   ),
   
@@ -347,7 +382,6 @@ server <- function(input, output, session) {
     )
   })
   
-# Server ----
   # Pick a random song when the app loads
   output$song_spotlight <- renderUI({
     
@@ -385,7 +419,7 @@ server <- function(input, output, session) {
     )
   })
   
-# Top Artists/Albums Logic
+  # Top Artists/Albums Logic
   filtered_artists_year <- reactive({
     combined_artists_tracks |>
       filter(charted_year == input$selected_year) |>
@@ -471,7 +505,7 @@ server <- function(input, output, session) {
     }
   })
   
-# Dynamic Track Selectors
+  # Dynamic Track Selectors
   output$artist_selector <- renderUI({
     choices <- combined_artists_tracks |> filter(charted_year == input$track_year) |> distinct(artist_name) |> arrange(artist_name)
     selectInput("selected_artist", "Select Artist:", choices = choices$artist_name)
@@ -506,7 +540,7 @@ server <- function(input, output, session) {
                 loading = "lazy")
   })
   
-# Top Artist/Album Tracks
+  # Top Artist/Album Tracks
   output$artist_tracks_plot <- renderPlotly({
     req(input$selected_artist)
     df <- combined_artists_tracks |>
@@ -543,7 +577,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-# Genre Tab
+  # Genre Tab
   output$genre_bar <- renderPlotly({
     req(input$selected_genres)
     df <- combined_artists_tracks |>
@@ -576,7 +610,7 @@ server <- function(input, output, session) {
       arrange(desc(popularity))
   })
   
-# Years Since Release
+  # Years Since Release
   output$years_release_plot <- renderPlotly({
     df <- combined_artists_tracks |>
       filter(!is.na(years_since_release),
@@ -594,7 +628,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-# Track Duration
+  # Track Duration
   output$duration_artist_selector <- renderUI({
     selectInput("duration_artist", "Select Artist:",
                 choices = c("All", sort(unique(combined_artists_tracks$artist_name))),
@@ -656,7 +690,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-# Number of Tracks in Album
+  # Number of Tracks in Album
   output$album_tracks_count_plot <- renderPlotly({
     req(input$tracks_year)
     album_counts <- combined_albums_tracks |>
@@ -672,7 +706,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-# Tracks with Features Tab
+  # Tracks with Features Tab
   output$features_album_selector <- renderUI({
     choices <- combined_albums_tracks |> filter(charted_year == input$features_year) |> distinct(album_name) |> arrange(album_name)
     selectInput("features_album", "Select Album:", choices = choices$album_name)
@@ -692,7 +726,7 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-# Most Common Words in Track Names
+  # Most Common Words in Track Names
   # Load sentiment lexicon
   bing_sentiments <- get_sentiments("bing")
   
@@ -763,7 +797,7 @@ server <- function(input, output, session) {
     ggplotly(p)
   })
   
-# New Album Releases Tab Logic
+  # New Album Releases Tab Logic
   output$new_release_date_plot <- renderPlotly({
     new_releases_combined$release_date <- as.Date(new_releases_combined$release_date)
     df <- new_releases_combined |>
