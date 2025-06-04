@@ -298,6 +298,12 @@ ui <- fluidPage(
 
 # Server ----
 server <- function(input, output, session) {
+  
+  observeEvent(input$toggleSidebar, {
+    shinyjs::toggleClass("sidebar", "hidden")
+    shinyjs::toggleClass("content", "fullwidth")
+  })
+  
   # Pick a random song when the app loads
   output$song_spotlight <- renderUI({
     
