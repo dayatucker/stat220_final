@@ -18,6 +18,7 @@ combined_artists_tracks <- combined_artists_tracks |>
 # Get all unique genres
 genre_choices <- combined_artists_tracks |>
   separate_rows(genres, sep = ",\\s*") |>
+  filter(!is.na(genres), genres != "") |>
   distinct(genres) |>
   arrange(genres) |>
   pull(genres)
@@ -40,6 +41,7 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  selectInput("selected_year", "Select Year:", choices = 2018:2024, selected = 2024),
+                 helpText("View top charting artists and albums by year."),
                  conditionalPanel(
                    condition = "input.top_selected == 'Top Artists'",
                    uiOutput("top_artist_iframe")
@@ -72,6 +74,7 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  selectInput("track_year", "Select Year:", choices = 2018:2024, selected = 2024),
+                 helpText("Explore top tracks by artist or album for a selected year."),
                  conditionalPanel(
                    condition = "input.track_tab_selected == 'By Artist'",
                    uiOutput("artist_selector"),
@@ -103,7 +106,8 @@ ui <- fluidPage(
                    label = "Select Genres:",
                    choices = genre_choices,
                    selected = selected_genres
-                 )
+                 ),
+                 helpText("Select one or more genres to compare track or album counts by year.")
                ),
                mainPanel(
                  br(),
@@ -145,6 +149,7 @@ ui <- fluidPage(
                sidebarPanel(
                  sliderInput("duration_range", "Select Track Duration (Minutes):",
                              min = 0, max = 10, value = c(2, 5), step = 0.1),
+                 helpText("Use the slider to filter tracks by duration in minutes."),
                  conditionalPanel(
                    condition = "input.duration_tab_selected == 'By Artist'",
                    uiOutput("duration_artist_selector")
@@ -169,7 +174,8 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  selectInput("tracks_year", "Select Charted Year:", 
-                             choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024)
+                             choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
+                 helpText("Select a year to see how many tracks albums had in that charting year.")
                ),
                mainPanel(
                  br(),
@@ -184,7 +190,8 @@ ui <- fluidPage(
                sidebarPanel(
                  selectInput("features_year", "Select Charted Year:", 
                              choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
-                 uiOutput("features_album_selector")
+                 uiOutput("features_album_selector"),
+                 helpText("Explore collaborations and featured artists for selected albums.")
                ),
                mainPanel(
                  br(),
@@ -355,7 +362,7 @@ server <- function(input, output, session) {
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
                   loading = "lazy")
     } else {
-      p(str_c("Select a row from the table to the right to view the artist's top tracks"))
+      helpText(str_c("Select a row from the table to the right to view the artist's top tracks"))
     }
   })
   
@@ -370,7 +377,7 @@ server <- function(input, output, session) {
                   loading = "lazy")
     } else {
       # Placeholder instructions
-      p(str_c("Select a row from the table to the right to view the songs on the album"))
+      helpText(str_c("Select a row from the table to the right to view the songs on the album"))
     }
   })
   
@@ -443,7 +450,7 @@ server <- function(input, output, session) {
     df <- combined_artists_tracks |>
       separate_rows(genres, sep = ",\\s*") |>
       filter(genres %in% input$selected_genres) |>
-      distinct(track_name, genres, charted_year) |>
+      distinct(album_name, genres, charted_year) |>
       count(genres, charted_year, name = "track_count") |>
       mutate(charted_year = as.factor(charted_year))
     p <- ggplot(df, aes(x = charted_year, y = track_count, fill = genres,
@@ -473,11 +480,18 @@ server <- function(input, output, session) {
   # Years Since Release
   output$years_release_plot <- renderPlotly({
     df <- combined_artists_tracks |>
-      filter(!is.na(years_since_release), years_since_release >= input$years_range[1], years_since_release <= input$years_range[2]) |>
-      mutate(hover_text = str_c("Artist: ", artist_name, "\nTrack: ", track_name, "\nYears Since Release: ", round(years_since_release, 1), "\nPopularity: ", popularity))
+      filter(!is.na(years_since_release),
+             years_since_release >= input$years_range[1],
+             years_since_release <= input$years_range[2]) |>
+      distinct(artist_name, track_name, .keep_all = TRUE) |>
+      mutate(hover_text = str_c("Artist: ", artist_name,
+                                "\nTrack: ", track_name,
+                                "\nYears Since Release: ", round(years_since_release, 1),
+                                "\nPopularity: ", popularity))
     p <- ggplot(df, aes(x = years_since_release, y = popularity, text = hover_text)) +
       geom_point(alpha = 0.6, color = "#1ed760") +
-      labs(title = "Track Popularity vs. Years Since Release", x = "Years Since Release", y = "Popularity")
+      labs(title = "Track Popularity vs. Years Since Release",
+           x = "Years Since Release", y = "Popularity")
     ggplotly(p, tooltip = "text")
   })
   
