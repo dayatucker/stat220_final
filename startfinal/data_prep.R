@@ -86,7 +86,7 @@ merge_artist_data <- function(artist_ids, charted_year){
               by = "artist_id") |>
     mutate(
       charted_year = charted_year,
-      years_since_release = charted_year - release_year
+      years_since_release = 2025 - release_year
     )
   return(all_tracks_temp)
 }
