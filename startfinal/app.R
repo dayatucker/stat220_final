@@ -416,32 +416,41 @@ server <- function(input, output, session) {
                 loading = "lazy")
   })
   
+  # Top Artist/Album Tracks
   output$artist_tracks_plot <- renderPlotly({
     req(input$selected_artist)
     df <- combined_artists_tracks |>
       filter(charted_year == input$track_year, artist_name == input$selected_artist)
-    
-    p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(explicit))) +
+    p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(explicit),
+                text = str_c(
+                  "Track: ", track_name,
+                  "\nPopularity: ", popularity,
+                  "\nExplicit: ", ifelse(explicit, "Yes", "No")
+                ))) +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#191414")) +
       labs(title = str_c("Tracks by ", input$selected_artist),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    ggplotly(p)
+    ggplotly(p, tooltip = "text")
   })
   
   output$album_tracks_plot <- renderPlotly({
     req(input$selected_album)
     df <- combined_albums_tracks |>
       filter(charted_year == input$track_year, album_name == input$selected_album)
-    
-    p <- ggplot(df, aes(x = reorder(track_name, track_popularity), y = track_popularity, fill = as.factor(track_explicit))) +
+    p <- ggplot(df, aes(x = reorder(track_name, track_popularity), y = track_popularity, fill = as.factor(track_explicit),
+                        text = str_c(
+                          "Track: ", track_name,
+                          "\nPopularity: ", track_popularity,
+                          "\nExplicit: ", ifelse(track_explicit, "Yes", "No")
+                        ))) +
       geom_bar(stat = "identity") +
       scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#191414")) +
       labs(title = str_c("Tracks from Album: ", input$selected_album),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    ggplotly(p)
+    ggplotly(p, tooltip = "text")
   })
   
   # Genre Tab
@@ -454,7 +463,7 @@ server <- function(input, output, session) {
       count(genres, charted_year, name = "track_count") |>
       mutate(charted_year = as.factor(charted_year))
     p <- ggplot(df, aes(x = charted_year, y = track_count, fill = genres,
-                        text = paste("Genre:", genres, "\nYear:", charted_year, "\nCount:", track_count))) +
+                        text = str_c("Genre: ", genres, "\nYear: ", charted_year, "\nCount: ", track_count))) +
       geom_col(position = "dodge") +
       labs(title = "Number of Tracks per Genre by Year",
            x = "Year", y = "Unique Track Count", fill = "Genre")
@@ -468,7 +477,7 @@ server <- function(input, output, session) {
       filter(genres %in% input$selected_genres) |>
       group_by(track_name, artist_name) |>
       summarise(
-        genres = paste(unique(genres), collapse = ", "),
+        genres = str_c(unique(genres), collapse = ", "),
         album_name = first(album_name),
         popularity = max(popularity, na.rm = TRUE),
         charted_years = paste(sort(unique(charted_year)), collapse = ", "),
