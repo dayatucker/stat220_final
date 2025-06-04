@@ -362,7 +362,7 @@ server <- function(input, output, session) {
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
                   loading = "lazy")
     } else {
-      helpText(str_c("Select a row from the table to the right to view the artist's top tracks"))
+      helpText(str_c("Select a row from the table to the right to view the artist's top 10 tracks"))
     }
   })
   
@@ -377,7 +377,7 @@ server <- function(input, output, session) {
                   loading = "lazy")
     } else {
       # Placeholder instructions
-      helpText(str_c("Select a row from the table to the right to view the songs on the album"))
+      helpText(str_c("Select a row from the table to the right to view the tracks on the album"))
     }
   })
   
