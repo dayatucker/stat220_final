@@ -73,11 +73,14 @@ ui <- fluidPage(
                  selectInput("track_year", "Select Year:", choices = 2018:2024, selected = 2024),
                  conditionalPanel(
                    condition = "input.track_tab_selected == 'By Artist'",
-                   uiOutput("artist_selector")
+                   uiOutput("artist_selector"),
+                   uiOutput("artist_tracks_iframe")
+                   
                  ),
                  conditionalPanel(
                    condition = "input.track_tab_selected == 'By Album'",
-                   uiOutput("album_selector")
+                   uiOutput("album_selector"),
+                   uiOutput("album_tracks_iframe")
                  )
                ),
                mainPanel(
@@ -334,7 +337,7 @@ server <- function(input, output, session) {
       selected_artist <- filtered_artists_year()[selected_row, "artist_id", drop = TRUE]
       # Construct a Spotify artist URL (example: replace spaces with + for search)
       artist_url <- str_c("https://open.spotify.com/embed/artist/", selected_artist)
-      tags$iframe(src = artist_url, width = "100%", height = "600", frameBorder = "0", 
+      tags$iframe(src = artist_url, width = "100%", height = "500", frameBorder = "0", 
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
                   loading = "lazy")
     } else {
@@ -348,7 +351,7 @@ server <- function(input, output, session) {
       selected_album <- filtered_albums_year()[selected_row, "album_id", drop = TRUE]
       # Construct a Spotify artist URL (example: replace spaces with + for search)
       album_url <- str_c("https://open.spotify.com/embed/album/", selected_album)
-      tags$iframe(src = album_url, width = "100%", height = "600", frameBorder = "0", 
+      tags$iframe(src = album_url, width = "100%", height = "500", frameBorder = "0", 
                   allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
                   loading = "lazy")
     } else {
@@ -368,6 +371,30 @@ server <- function(input, output, session) {
     selectInput("selected_album", "Select Album:", choices = choices$album_name)
   })
   
+  output$artist_tracks_iframe <- renderUI({
+    req(input$selected_artist)
+    df <- combined_artists_tracks |>
+      filter(charted_year == input$track_year, artist_name == input$selected_artist)
+    artist_id <- df$artist_id[1]
+    
+    artist_url <- str_c("https://open.spotify.com/embed/artist/", artist_id)
+    tags$iframe(src = artist_url, width = "100%", height = "500", frameBorder = "0", 
+                allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
+                loading = "lazy")
+  })
+  
+  output$album_tracks_iframe <- renderUI({
+    req(input$selected_album)
+    df <- combined_albums_tracks |>
+      filter(charted_year == input$track_year, album_name == input$selected_album)
+    album_id <- df$album_id[1]
+    
+    album_url <- str_c("https://open.spotify.com/embed/album/", album_id)
+    tags$iframe(src = album_url, width = "100%", height = "500", frameBorder = "0", 
+                allowfullscreen = "", allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture", 
+                loading = "lazy")
+  })
+  
   output$artist_tracks_plot <- renderPlotly({
     req(input$selected_artist)
     df <- combined_artists_tracks |>
@@ -381,6 +408,7 @@ server <- function(input, output, session) {
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p)
   })
+  
   output$album_tracks_plot <- renderPlotly({
     req(input$selected_album)
     df <- combined_albums_tracks |>
