@@ -50,6 +50,7 @@ ui <- fluidPage(
                  )
                ),
                mainPanel(
+                 br(),
                  tabsetPanel(id = "top_selected",
                              tabPanel("Top Artists",
                                       h3("Top Artists"),
@@ -84,6 +85,7 @@ ui <- fluidPage(
                  )
                ),
                mainPanel(
+                 br(),
                  tabsetPanel(id = "track_tab_selected",
                              tabPanel("By Artist", plotlyOutput("artist_tracks_plot")),
                              tabPanel("By Album", plotlyOutput("album_tracks_plot"))
