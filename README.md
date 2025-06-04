@@ -72,7 +72,7 @@ Includes:
 - album_url
 - charted_year
 
-#### Resources
+## Resources
 Set up a Shiny app to use shinyjs: (https://www.rdocumentation.org/packages/shinyjs/versions/2.1.0/topics/useShinyjs)
 ## Authors
 - Aubrey Tran
