@@ -106,6 +106,7 @@ ui <- fluidPage(
                  )
                ),
                mainPanel(
+                 br(),
                  tabsetPanel(
                    tabPanel("Bar Chart", plotlyOutput("genre_bar")),
                    tabPanel("Track Table", DT::dataTableOutput("genre_table"))
@@ -132,6 +133,7 @@ ui <- fluidPage(
                  helpText("Negative values indicate tracks released after the charting year (e.g. pre-releases or delayed data).")
                ),
                mainPanel(
+                 br(),
                  plotlyOutput("years_release_plot", height = "600px")
                )
              )
@@ -153,6 +155,7 @@ ui <- fluidPage(
                  )
                ),
                mainPanel(
+                 br(),
                  tabsetPanel(id = "duration_tab_selected",
                              tabPanel("By Artist", plotlyOutput("duration_artist_plot")),
                              tabPanel("By Album", plotlyOutput("duration_album_plot"))
@@ -168,7 +171,10 @@ ui <- fluidPage(
                  selectInput("tracks_year", "Select Charted Year:", 
                              choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024)
                ),
-               mainPanel(plotlyOutput("album_tracks_count_plot"))
+               mainPanel(
+                 br(),
+                 plotlyOutput("album_tracks_count_plot")
+               )
              )
     ),
     
@@ -180,7 +186,9 @@ ui <- fluidPage(
                              choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
                  uiOutput("features_album_selector")
                ),
-               mainPanel(plotlyOutput("featured_tracks_plot"))
+               mainPanel(
+                 br(),
+                 plotlyOutput("featured_tracks_plot"))
              )
     ),
     
@@ -194,6 +202,7 @@ ui <- fluidPage(
                    helpText("Words are colored by sentiment (positive/negative)")
                  ),
                  mainPanel(
+                   br(),
                    plotlyOutput("word_trend_plot")
                  )
                )
@@ -217,6 +226,7 @@ ui <- fluidPage(
                             helpText("Select a date range only within April 2024.")
                           ),
                           mainPanel(
+                            br(),
                             plotlyOutput("new_release_date_plot")
                           )
                         )
@@ -227,6 +237,7 @@ ui <- fluidPage(
                             helpText("This plot shows how many tracks were released on each weekday in April 2024.")
                           ),
                           mainPanel(
+                            br(),
                             plotlyOutput("weekday_track_count_plot")
                           )
                         )
