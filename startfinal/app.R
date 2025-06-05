@@ -119,6 +119,7 @@ ui <- fluidPage(
   div(id = "sidebar",
       h3("Menu"),
       radioButtons("nav", NULL, choices = c(
+        "Info" = "info_tab",
         "Top Artists/Albums" = "artists",
         "Top Tracks" = "tracks",
         "Track Genre" = "genre",
@@ -154,6 +155,12 @@ server <- function(input, output, session) {
   
   output$main_content <- renderUI({
     switch(input$nav,
+           "info_tab" = {
+             tabPanel("Info",
+                      mainPanel(
+                        h3("Info")
+                      ))
+           },
            "artists" = {
              # Top Artists/Albums Tab
              tabPanel("Top Artists/Albums",
