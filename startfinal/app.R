@@ -158,7 +158,8 @@ server <- function(input, output, session) {
            "info_tab" = {
              tabPanel("Info",
                       mainPanel(
-                        h3("Info")
+                        h3("Info"),
+                        p("Very informative text yay!")
                       ))
            },
            "artists" = {
