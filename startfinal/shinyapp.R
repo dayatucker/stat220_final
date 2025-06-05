@@ -27,6 +27,19 @@ selected_genres <- sample(genre_choices, 3)
 # UI ----
 ui <- fluidPage(
   useShinyjs(),
+  includeCSS("spotify_app/www/styles.css"),
+  
+  tags$script(HTML("
+      $(document).ready(function() {
+        $(document).on('click', function(event) {
+          var sidebar = $('#sidebar');
+          var toggleBtn = $('#toggleSidebar');
+          if (!sidebar.is(event.target) && sidebar.has(event.target).length === 0 && !toggleBtn.is(event.target)) {
+            Shiny.setInputValue('closeSidebar', true);
+          }
+        });
+      });
+    ")),
   
   tags$head(
     tags$style(HTML("
@@ -133,8 +146,6 @@ ui <- fluidPage(
   ),
   
   div(id = "content",
-      p(
-        includeCSS("spotify_app/www/styles.css"),
         
         titlePanel("Spotify Music Explorer 2018-2024"),
         
@@ -143,14 +154,33 @@ ui <- fluidPage(
         uiOutput("song_spotlight"),
         
         uiOutput("main_content")
-      )))
+      ))
 
 # Server ----
 server <- function(input, output, session) {
   
+  sidebarOpen <- reactiveVal(TRUE)
+  
+  # Toggle sidebar on button click
   observeEvent(input$toggleSidebar, {
-    shinyjs::toggleClass("sidebar", "hidden")
-    shinyjs::toggleClass("content", "fullwidth")
+    sidebarOpen(!sidebarOpen())
+    toggleClass(id = "sidebar", class = "hidden")
+  })
+  
+  # Close sidebar when a menu item is clicked
+  observeEvent(input$nav, {
+    if (sidebarOpen()) {
+      sidebarOpen(FALSE)
+      toggleClass(id = "sidebar", class = "hidden")
+    }
+  })
+  
+  # Close sidebar when clicking outside
+  observeEvent(input$closeSidebar, {
+    if (sidebarOpen()) {
+      sidebarOpen(FALSE)
+      toggleClass(id = "sidebar", class = "hidden")
+    }
   })
   
   output$main_content <- renderUI({
