@@ -1,0 +1,197 @@
+@font-face {
+    font-family: 'SpotifyMix';
+    src: url('spotifymix.woff') format('woff'), url('spotifymix.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SpotifyMixBold';
+    src: url('spotifymixbold.woff') format('woff'), url('spotifymixbold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    font-family: 'SpotifyMix', Arial, sans-serif !important;
+}
+
+body {
+    background-color:	#121212;
+    color: #ffffff;
+
+}
+
+h2, h3, h4, h5 {
+  font-family: 'SpotifyMixBold', Arial, sans-serif !important;
+}
+
+.nav-tabs li a {
+    color: #ffffff;
+}
+
+.nav-tabs li a:hover {
+    background-color: #535353;
+    color: ##ffffff;
+    border: none;
+}
+
+.nav-tabs > li.active > a, 
+.nav-tabs > li.active > a:hover, 
+.nav-tabs > li.active > a:focus {
+    background-color: #1ed760 !important;
+    color: #121212 !important;
+    border: none;
+}
+
+.well {
+  background-color: #121212;
+  border: none;
+}
+
+.selectize-input input {
+    background-color: #1ed760; !important 
+    color: #ffffff !important;
+    border: 2px solid #1ed760;
+    border-radius: 4px;
+}
+.selectize-input.focus {
+    border-color: #ffffff;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.selectize-dropdown {
+    background-color: #212121;
+    color: #ffffff;
+    border: 2px solid #1ed760;
+    border-radius: 4px; 
+}
+
+div.selectize-dropdown .option.active {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+
+.selectize-dropdown .option:hover {
+  background-color: #1ed760 !important;
+  color: #121212; 
+}
+
+.selectize-dropdown .option:focus {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+div.datatables {
+  color: #ffffff;
+}
+
+
+
+.dataTable tbody tr:nth-child(odd) {
+  background-color: #212121;
+}
+
+.dataTable tbody tr:nth-child(even) {
+  background-color: #121212;
+}
+
+table.dataTable tbody tr.odd.selected,
+table.dataTable tbody tr.even.selected{
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.dataTables_filter input:focus {
+  outline: none;
+  border: 2px solid #1ed760 !important;
+  box-shadow: 0 0 5px #1ed760;
+}
+
+.dataTables_length select {
+  background-color: #ffffff !important;
+  color: #121212 !important;
+}
+
+div.dataTables_length select option {
+  background-color: #212121 !important;
+  color: #ffffff !important;
+}
+
+
+div.dataTables_length select option:hover {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+div.well {
+  border: none;
+}
+
+.irs-slider {
+  background-color: #1ed760 !important;
+}
+
+.irs-bar {
+  background-color: #1ed760 !important;
+  border-color: #1ed760 !important;
+}
+
+.irs-from, .irs-to, .irs-single {
+    color: #121212 !important; 
+    background-color: #1ed760 !important;
+}
+
+/* Default style for the date picker pop-up (gray background, white text) */
+.datepicker {
+  background-color: #212121;
+  color: #ffffff;
+}
+/* Style for individual day cells in the calendar */
+.datepicker .day {
+  background-color: #212121;
+  color: #ffffff;
+}
+/* Hover style for the days (green background, black text) */
+.datepicker .day:hover {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+/* Style for the selected day */
+.datepicker .day.active {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.datepicker .month:hover {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.datepicker .month.active {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.datepicker .year:hover {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+.datepicker .year.active {
+  background-color: #1ed760 !important;
+  color: #121212 !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
