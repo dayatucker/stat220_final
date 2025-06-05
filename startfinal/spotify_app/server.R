@@ -4,9 +4,28 @@
 
 server <- function(input, output, session) {
   
+  sidebarOpen <- reactiveVal(TRUE)
+  
+  # Toggle sidebar on button click
   observeEvent(input$toggleSidebar, {
-    shinyjs::toggleClass("sidebar", "hidden")
-    shinyjs::toggleClass("content", "fullwidth")
+    sidebarOpen(!sidebarOpen())
+    toggleClass(id = "sidebar", class = "hidden")
+  })
+  
+  # Close sidebar when a menu item is clicked
+  observeEvent(input$nav, {
+    if (sidebarOpen()) {
+      sidebarOpen(FALSE)
+      toggleClass(id = "sidebar", class = "hidden")
+    }
+  })
+  
+  # Close sidebar when clicking outside
+  observeEvent(input$closeSidebar, {
+    if (sidebarOpen()) {
+      sidebarOpen(FALSE)
+      toggleClass(id = "sidebar", class = "hidden")
+    }
   })
   
   output$main_content <- renderUI({
@@ -712,3 +731,4 @@ server <- function(input, output, session) {
 
 # Run App ----
 shinyApp(ui, server)
+
