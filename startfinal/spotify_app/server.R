@@ -1,6 +1,7 @@
+# server.R
+# Contains the server logic for the Shiny app.
+# Defines reactive expressions, outputs, and event handling.
 
-
-# Server ----
 server <- function(input, output, session) {
   
   observeEvent(input$toggleSidebar, {

@@ -1,3 +1,7 @@
+# global.R
+# Contains global objects and data setup.
+# Loaded once when the app starts, shared across ui and server.
+
 # Load libraries
 library(shiny)
 library(shinyjs)
