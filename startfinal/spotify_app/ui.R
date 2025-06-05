@@ -8,7 +8,6 @@ ui <- fluidPage(
   
   
   tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "www/styles.css"),
     # JavaScript to handle clicks outside sidebar
     tags$script(HTML("
       $(document).ready(function() {
@@ -20,7 +19,25 @@ ui <- fluidPage(
           }
         });
       });
-    "))
+    ")),
+    tags$style(HTML("
+            @font-face {
+                font-family: 'SpotifyMix';
+                src: url('/spotifymix.woff') format('woff');
+            }
+            @font-face {
+                font-family: 'SpotifyMixBold';
+                src: url('/spotifymixbold.woff') format('woff');
+            }
+            html body {
+                font-family: 'SpotifyMix', Arial, sans-serif !important;
+            }
+            html h2, html h3, html h4, html h5 {
+                font-family: 'SpotifyMixBold', Arial, sans-serif !important;
+            }
+        "))
+    #tags$link(rel = "stylesheet", type = "text/css", href = "www/styles.css")
+    
   ),
   
   

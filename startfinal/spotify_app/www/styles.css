@@ -3,9 +3,7 @@
     src: url('spotifymix.woff') format('woff'), url('spotifymix.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
-}
 
-@font-face {
     font-family: 'SpotifyMixBold';
     src: url('spotifymixbold.woff') format('woff'), url('spotifymixbold.ttf') format('truetype');
     font-weight: normal;
