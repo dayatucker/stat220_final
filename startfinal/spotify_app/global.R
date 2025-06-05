@@ -10,7 +10,7 @@ library(DT)
 library(plotly)
 library(tidytext)
 
-# Load Data ----
+# Load Data 
 combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv")
 combined_albums_tracks <- read_csv("data/combined_albums_tracks_2018_2024.csv")
 new_releases_combined <- read_csv("data/new_releases_combined.csv")
@@ -28,3 +28,4 @@ genre_choices <- combined_artists_tracks |>
   pull(genres)
 # Randomly select 3 genres
 selected_genres <- sample(genre_choices, 3)
+
