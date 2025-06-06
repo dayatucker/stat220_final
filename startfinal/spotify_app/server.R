@@ -2,8 +2,6 @@
 # Contains the server logic for the Shiny app.
 # Defines reactive expressions, outputs, and event handling.
 
-source("global.R")
-
 server <- function(input, output, session) {
   
   sidebarOpen <- reactiveVal(TRUE)
