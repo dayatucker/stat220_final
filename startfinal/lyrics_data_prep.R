@@ -78,6 +78,28 @@ write_csv(album_tracks_with_lyrics, "album_tracks_with_lyrics.csv")
 
 all_track_lyrics <- bind_rows(artist_tracks_with_lyrics, album_tracks_with_lyrics) |> 
   distinct(artist_name, track_name, lyrics, .keep_all = TRUE)
-
 write_csv(all_track_lyrics, "all_track_lyrics.csv")
+
+
+clean_lyrics <- function(text) {
+  text |>
+    str_replace("(?i).*?lyrics", "") |>         # Remove everything before "Lyrics" (case-insensitive)
+    str_remove_all("\\[.*?\\]") |>              # Remove text in square brackets
+    str_remove_all("[[:punct:]]") |>            # Remove punctuation
+    str_to_lower() |>                           # Convert to lowercase (optional)
+    str_squish()                                # Trim extra whitespace
+}
+
+
+lyrics_data_clean <- all_track_lyrics |>
+  mutate(lyrics = if_else(is.na(lyrics), NA_character_, clean_lyrics(lyrics)))
+
+write_csv(lyrics_data_clean, "data/all_track_lyrics.csv")
+
+
+
+
+
+
+
 
