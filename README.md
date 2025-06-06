@@ -72,17 +72,17 @@ Includes:
 - album_url
 - charted_year
 
-#### `album_tracks_with_lyrics.csv`: 
+#### `all_track_lyrics.csv`: 
 Includes:
 - track_name
 - artist_name
 - lyrics
 
-#### `arist_tracks_with_lyrics.csv`: 
+#### `lyrics_words.csv`: 
 Includes:
 - track_name
 - artist_name
-- lyrics
+- word
 
 ## Resources
 Set up a Shiny app to use shinyjs: (https://www.rdocumentation.org/packages/shinyjs/versions/2.1.0/topics/useShinyjs)
