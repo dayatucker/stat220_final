@@ -263,20 +263,20 @@ server <- function(input, output, session) {
              )
            },
            "lyric_analysis" = {
-             
-             tabPanel("New Album Releases 2024",
+             tabPanel("Lyric Analysis",
                       br(),
                       tabsetPanel(
-                        tabPanel("tab1",
+                        tabPanel("Top Words",
                                  sidebarLayout(
                                    sidebarPanel(
+                                     helpText("This is text that will do something later.")
                                    ),
                                    mainPanel(
                                      br(),
                                    )
                                  )
                         ),
-                        tabPanel("tab2",
+                        tabPanel("Sentiment Analysis",
                                  sidebarLayout(
                                    sidebarPanel(
                                    ),
