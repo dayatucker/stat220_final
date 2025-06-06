@@ -156,7 +156,7 @@ server <- function(input, output, session) {
                           br(),
                           plotlyOutput("years_release_plot", height = "600px"),
                           br(),
-                          p("This plot shows how many years have passed between a track's original release date and when it charted again, highlighting trends in resurfacing older music.")
+                          p("This plot shows how many years have passed between a track's original release date and 2025, highlighting trends in resurfacing older music.")
                         )
                       )
              )
