@@ -2,6 +2,8 @@
 # Defines the user interface of the Shiny app.
 # Contains layout, input controls, and output placeholders.
 
+source("data_prep.R")
+
 ui <- fluidPage(
   useShinyjs(),
   includeCSS("www/styles.css"),
