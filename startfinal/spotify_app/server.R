@@ -82,7 +82,6 @@ server <- function(input, output, session) {
                             condition = "input.track_tab_selected == 'By Artist'",
                             uiOutput("artist_selector"),
                             uiOutput("artist_tracks_iframe")
-                            
                           ),
                           conditionalPanel(
                             condition = "input.track_tab_selected == 'By Album'",
@@ -93,8 +92,16 @@ server <- function(input, output, session) {
                         mainPanel(
                           br(),
                           tabsetPanel(id = "track_tab_selected",
-                                      tabPanel("By Artist", plotlyOutput("artist_tracks_plot")),
-                                      tabPanel("By Album", plotlyOutput("album_tracks_plot"))
+                                      tabPanel("By Artist", 
+                                               plotlyOutput("artist_tracks_plot"),
+                                               br(),
+                                               p("This plot highlights the most popular tracks for a selected artist in a given year. Popularity is based on Spotify's track popularity index.")
+                                      ),
+                                      tabPanel("By Album", 
+                                               plotlyOutput("album_tracks_plot"),
+                                               br(),
+                                               p("This plot displays the popularity of tracks within a selected album for a specific year, helping compare standout songs within albums.")
+                                      )
                           )
                         )
                       )
@@ -116,7 +123,11 @@ server <- function(input, output, session) {
                         mainPanel(
                           br(),
                           tabsetPanel(
-                            tabPanel("Bar Chart", plotlyOutput("genre_bar")),
+                            tabPanel("Bar Chart",
+                                     plotlyOutput("genre_bar"),
+                                     br(),
+                                     p("This bar chart shows how selected genres have trended in popularity over the years, based on track counts per year. It helps visualize how genre preferences evolve over time.")
+                            ),
                             tabPanel("Track Table", DT::dataTableOutput("genre_table"))
                           )
                         )
@@ -143,7 +154,9 @@ server <- function(input, output, session) {
                         ),
                         mainPanel(
                           br(),
-                          plotlyOutput("years_release_plot", height = "600px")
+                          plotlyOutput("years_release_plot", height = "600px"),
+                          br(),
+                          p("This plot shows how many years have passed between a track's original release date and when it charted again, highlighting trends in resurfacing older music.")
                         )
                       )
              )
@@ -168,8 +181,16 @@ server <- function(input, output, session) {
                         mainPanel(
                           br(),
                           tabsetPanel(id = "duration_tab_selected",
-                                      tabPanel("By Artist", plotlyOutput("duration_artist_plot")),
-                                      tabPanel("By Album", plotlyOutput("duration_album_plot"))
+                                      tabPanel("By Artist", 
+                                               plotlyOutput("duration_artist_plot"),
+                                               br(),
+                                               p("This plot displays the distribution of track durations by artist, allowing insight into which artists tend to produce shorter or longer songs.")
+                                      ),
+                                      tabPanel("By Album", 
+                                               plotlyOutput("duration_album_plot"),
+                                               br(),
+                                               p("This plot shows the track duration distribution within selected albums, helping explore how consistent or varied track lengths are across an album.")
+                                      )
                           )
                         )
                       )
@@ -191,22 +212,25 @@ server <- function(input, output, session) {
                       )
              )
            },
-           "features" = {
-             # Tracks with Features Tab
-             tabPanel("Tracks with Features",
-                      sidebarLayout(
-                        sidebarPanel(
-                          selectInput("features_year", "Select Charted Year:", 
-                                      choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
-                          uiOutput("features_album_selector"),
-                          helpText("Explore collaborations and featured artists for selected albums.")
-                        ),
-                        mainPanel(
-                          br(),
-                          plotlyOutput("featured_tracks_plot"))
-                      )
-             )
-           },
+             "features" = {
+               # Tracks with Features Tab
+               tabPanel("Tracks with Features",
+                        sidebarLayout(
+                          sidebarPanel(
+                            selectInput("features_year", "Select Charted Year:", 
+                                        choices = sort(unique(combined_albums_tracks$charted_year)), selected = 2024),
+                            uiOutput("features_album_selector"),
+                            helpText("Explore collaborations and featured artists for selected albums.")
+                          ),
+                          mainPanel(
+                            br(),
+                            plotlyOutput("featured_tracks_plot"),
+                            br(),
+                            p("This plot displays the popularity of tracks that include featured artists from a selected album and year. It helps explore how collaborations may influence track performance.")
+                          )
+                        )
+               )
+             },
            "new_releases" = {
              # New Album Releases Tab
              tabPanel("New Album Releases 2024",
@@ -227,7 +251,9 @@ server <- function(input, output, session) {
                                    ),
                                    mainPanel(
                                      br(),
-                                     plotlyOutput("new_release_date_plot")
+                                     plotlyOutput("new_release_date_plot"),
+                                     br(),
+                                     p("This plot shows the number of new album releases in April 2024 by release date, helping to visualize peak release days during the month.")
                                    )
                                  )
                         ),
@@ -238,7 +264,9 @@ server <- function(input, output, session) {
                                    ),
                                    mainPanel(
                                      br(),
-                                     plotlyOutput("weekday_track_count_plot")
+                                     plotlyOutput("weekday_track_count_plot"),
+                                     br(),
+                                     p("This plot helps identify which weekdays were most popular for album releases during April 2024.")
                                    )
                                  )
                         )
@@ -246,6 +274,7 @@ server <- function(input, output, session) {
              )
            },
            "lyric_analysis" = {
+             # Lyric analysis tab
              tabPanel("Sentiment Analysis",
                       sidebarLayout(
                         sidebarPanel(
@@ -254,7 +283,11 @@ server <- function(input, output, session) {
                         ),
                         mainPanel(
                           br(),
-                          plotlyOutput("lyric_sentiment_trend")
+                          plotlyOutput("lyric_sentiment_trend"),
+                          br(),
+                          p("This plot displays a faceted scatterplot to examine trends in sentiment-associated lyric words over time.",
+                            "Words are selected based on the 'bing' lexicon and plotted to show how often they appear in songs across years,",
+                            "grouped by positive or negative sentiment.")
                         )
                       )
              )
@@ -692,11 +725,12 @@ server <- function(input, output, session) {
       facet_wrap(~ word, scales = "free_y") +
       labs(title = "Sentiment Trend of Selected Lyric Words",
            x = "Year", y = "Count", color = "Sentiment") +
+      scale_color_manual(values = c("positive" = "#1ed760", "negative" = "#191414")) +
       theme_minimal() +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p)
   })
-  
 }
-# # Run App ----
+  
+# Run App ----
 # shinyApp(ui, server)
