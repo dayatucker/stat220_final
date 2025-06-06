@@ -6,6 +6,7 @@ library(stringr)
 library(rvest)
 library(purrr)
 library(tidyverse)
+library(tidytext)
 
 
 combined_artists_tracks <- read_csv("stat220_final/startfinal/spotify_app/data/combined_artists_tracks_2018_2024.csv")
@@ -78,8 +79,6 @@ write_csv(album_tracks_with_lyrics, "album_tracks_with_lyrics.csv")
 
 all_track_lyrics <- bind_rows(artist_tracks_with_lyrics, album_tracks_with_lyrics) |> 
   distinct(artist_name, track_name, lyrics, .keep_all = TRUE)
-write_csv(all_track_lyrics, "all_track_lyrics.csv")
-
 
 clean_lyrics <- function(text) {
   text |>
@@ -90,11 +89,20 @@ clean_lyrics <- function(text) {
     str_squish()                                # Trim extra whitespace
 }
 
-
 lyrics_data_clean <- all_track_lyrics |>
   mutate(lyrics = if_else(is.na(lyrics), NA_character_, clean_lyrics(lyrics)))
 
 write_csv(lyrics_data_clean, "data/all_track_lyrics.csv")
+
+lyrics_words <- lyrics_data_clean |>
+  unnest_tokens(word, lyrics)
+
+data("stop_words") 
+
+lyrics_words_filtered <- lyrics_words |>
+  anti_join(stop_words, by = "word")
+
+write_csv(lyrics_words_filtered, "data/lyrics_words.csv")
 
 
 
