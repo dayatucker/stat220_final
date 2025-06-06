@@ -39,4 +39,17 @@ lyrics_words <- lyrics_words |>
     by = c("track_name", "artist_name")
   )
 
+# top 10 most common words by genre
+lyrics_by_genre <- lyrics_words |>
+  inner_join(combined_artists_tracks, by = c("track_name", "artist_name"))
+
+word_counts_by_genre <- lyrics_by_genre |>
+  count(genres, word, sort = TRUE)
+
+top_words_by_genre <- word_counts_by_genre |>
+  filter(!is.na(genres)) |>
+  group_by(genres) |>
+  slice_max(order_by = n, n = 10) |>
+  ungroup()
+
 

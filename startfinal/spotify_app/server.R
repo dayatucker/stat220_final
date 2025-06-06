@@ -275,6 +275,7 @@ server <- function(input, output, session) {
            },
            "lyric_analysis" = {
              # Lyric analysis tab
+             tabsetPanel(
              tabPanel("Sentiment Analysis",
                       sidebarLayout(
                         sidebarPanel(
@@ -290,7 +291,31 @@ server <- function(input, output, session) {
                             "grouped by positive or negative sentiment.")
                         )
                       )
-             )
+             ),
+             tabPanel("Top Words by Genre",
+                      sidebarLayout(
+                        sidebarPanel(
+                          selectInput("selected_genre", "Choose a genre:",
+                                      choices = sort(unique(top_words_by_genre$genres)),
+                                      selected = unique(top_words_by_genre$genres)[1]),
+                          helpText("Select a genre to explore the most common words 
+                                 used in lyrics from that style of music. The chart 
+                                 will update automatically to show the top 10 words
+                                 and how often they appear.")
+                          ),
+                        mainPanel(
+                          br(),
+                          plotlyOutput("genre_barplot"),
+                          br(),
+                          p("This interactive bar chart displays the top 10 most 
+                            frequent words found in song lyrics within a 
+                            selected genre, based on Spotify tracks from 2018 to 
+                            2024. When a user selects a genre from the dropdown, 
+                            the plot updates to show the most common words used 
+                            in that genre's lyrics, along with their frequency 
+                            counts. ")
+                        )
+                      )))
            }
     )
   })
@@ -487,6 +512,24 @@ server <- function(input, output, session) {
       labs(title = str_c("Tracks from Album: ", input$selected_album),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    ggplotly(p, tooltip = "text")
+  })
+  
+  # Top words by genre
+  output$genre_barplot <- renderPlotly({
+    genre_data <- top_words_by_genre |>
+      filter(genres == input$selected_genre)
+    
+    p <- ggplot(genre_data, aes(x = reorder(word, n), y = n, text = str_c("Count: ", n))) +
+      geom_col(fill = "#2c3e50") +
+      coord_flip() +
+      labs(
+        title = paste("Top 10 Words in", input$selected_genre),
+        x = "Word",
+        y = "Frequency"
+      ) +
+      theme_minimal()
+    
     ggplotly(p, tooltip = "text")
   })
   
