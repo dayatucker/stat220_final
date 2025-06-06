@@ -90,6 +90,7 @@ Includes:
 - Spotify App: (https://open.spotify.com/)
 - Spotify Wrapped Links: (https://newsroom.spotify.com/?s=wrapped)
 - Lyrics: ([GitHub.com/ewenme/geniusr](https://github.com/ewenme/geniusr)) and (https://docs.genius.com/)
+- Spotify Color Scheme: (https://developer.spotify.com/documentation/design#using-our-logo)
 
 ## Authors
 - Aubrey Tran
