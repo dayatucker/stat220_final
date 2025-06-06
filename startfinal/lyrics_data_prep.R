@@ -76,5 +76,8 @@ album_tracks_with_lyrics <- get_lyrics(combined_albums_tracks)
 write_csv(artist_tracks_with_lyrics, "artist_tracks_with_lyrics.csv")
 write_csv(album_tracks_with_lyrics, "album_tracks_with_lyrics.csv")
 
+all_track_lyrics <- bind_rows(artist_tracks_with_lyrics, album_tracks_with_lyrics) |> 
+  distinct(artist_name, track_name, lyrics, .keep_all = TRUE)
 
+write_csv(all_track_lyrics, "all_track_lyrics.csv")
 
