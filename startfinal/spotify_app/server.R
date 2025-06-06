@@ -139,7 +139,7 @@ server <- function(input, output, session) {
                             ),
                             step = 1
                           ),
-                          helpText("Negative values indicate tracks released after the charting year (e.g. pre-releases or delayed data).")
+                          helpText("Values indicate tracks released after 2025.")
                         ),
                         mainPanel(
                           br(),
