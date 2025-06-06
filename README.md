@@ -86,6 +86,8 @@ Includes:
 
 ## Resources
 Set up a Shiny app to use shinyjs: (https://www.rdocumentation.org/packages/shinyjs/versions/2.1.0/topics/useShinyjs)
+Lyrics: ([GitHub.com/ewenme/geniusr](https://github.com/ewenme/geniusr)) and (https://docs.genius.com/)
+
 ## Authors
 - Aubrey Tran
 - Daya Tucker
