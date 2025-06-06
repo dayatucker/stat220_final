@@ -207,23 +207,6 @@ server <- function(input, output, session) {
                       )
              )
            },
-           "words" = {
-             # Most Common Words in Track Names
-             tabPanel("Most Common Words in Track Names",
-                      fluidPage(
-                        sidebarLayout(
-                          sidebarPanel(
-                            uiOutput("word_selector_ui"),
-                            helpText("Words are colored by sentiment (positive/negative)")
-                          ),
-                          mainPanel(
-                            br(),
-                            plotlyOutput("word_trend_plot")
-                          )
-                        )
-                      )
-             )
-           },
            "new_releases" = {
              # New Album Releases Tab
              tabPanel("New Album Releases 2024",
@@ -263,27 +246,15 @@ server <- function(input, output, session) {
              )
            },
            "lyric_analysis" = {
-             tabPanel("Lyric Analysis",
-                      br(),
-                      tabsetPanel(
-                        tabPanel("Top Words",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                     helpText("This is text that will do something later.")
-                                   ),
-                                   mainPanel(
-                                     br(),
-                                   )
-                                 )
+             tabPanel("Sentiment Analysis",
+                      sidebarLayout(
+                        sidebarPanel(
+                          uiOutput("lyric_word_selector"),
+                          helpText("Choose top words to view their sentiment trend over time.")
                         ),
-                        tabPanel("Sentiment Analysis",
-                                 sidebarLayout(
-                                   sidebarPanel(
-                                   ),
-                                   mainPanel(
-                                     br(),
-                                   )
-                                 )
+                        mainPanel(
+                          br(),
+                          plotlyOutput("lyric_sentiment_trend")
                         )
                       )
              )
@@ -635,77 +606,6 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-  # Most Common Words in Track Names
-  # Load sentiment lexicon
-  bing_sentiments <- get_sentiments("bing")
-  
-  top_words_sentiment <- reactive({
-    # Ensure unique track names within each year
-    unique_tracks <- combined_albums_tracks |>
-      filter(!is.na(charted_year)) |>
-      distinct(charted_year, track_name)  # distinct per year
-    
-    # Tokenize words from track names
-    word_data <- unique_tracks |>
-      unnest_tokens(word, track_name) |>
-      anti_join(stop_words, by = "word") |>
-      count(charted_year, word, sort = TRUE)
-    
-    # Get overall top 10 words across all years
-    top_words <- word_data |>
-      group_by(word) |>
-      summarise(total = sum(n), .groups = "drop") |>
-      slice_max(order_by = total, n = 10) |>
-      left_join(bing_sentiments, by = "word") |>
-      mutate(sentiment = replace_na(sentiment, "neutral"))
-    
-    list(top_words = top_words, word_counts = word_data)
-  })
-  
-  # Update word choices in checkboxGroupInput
-  observe({
-    words <- top_words_sentiment()$top_words$word
-    updateCheckboxGroupInput(inputId = "selected_words",
-                             choices = words,
-                             selected = words)
-  })
-  
-  output$word_selector_ui <- renderUI({
-    words <- top_words_sentiment()$top_words$word
-    checkboxGroupInput(
-      inputId = "selected_words",
-      label = "Select Words to Display:",
-      choices = words,
-      selected = words
-    )
-  })
-  
-  # Render the sentiment plot
-  output$word_trend_plot <- renderPlotly({
-    
-    req(input$selected_words)
-    
-    data_all <- top_words_sentiment()
-    top_words <- data_all$top_words
-    word_counts <- data_all$word_counts
-    
-    # Filter to selected words
-    selected_trends <- word_counts |>
-      semi_join(top_words |> filter(word %in% input$selected_words), by = "word") |>
-      left_join(top_words |> select(word, sentiment), by = "word")
-    
-    # Plot
-    p <- selected_trends |>
-      ggplot(aes(x = charted_year, y = n, color = sentiment, group = word)) +
-      geom_line(aes(linetype = word)) +
-      labs(title = "Trends in Usage of Common Track Name Words",
-           x = "Year",
-           y = "Word Frequency",
-           color = "Sentiment",
-           linetype = "Word")
-    ggplotly(p)
-  })
-  
   # New Album Releases Tab Logic
   output$new_release_date_plot <- renderPlotly({
     new_releases_combined$release_date <- as.Date(new_releases_combined$release_date)
@@ -732,8 +632,10 @@ server <- function(input, output, session) {
   })
   
   output$weekday_track_count_plot <- renderPlotly({
+    req(input$release_date_range)
     df <- new_releases_combined |>
-      filter(format(release_date, "%Y-%m") == "2024-04") |>
+      filter(release_date >= input$release_date_range[1],
+             release_date <= input$release_date_range[2]) |>
       mutate(weekday = weekdays(release_date)) |>
       count(weekday, name = "track_count") |>
       mutate(weekday = factor(
@@ -741,17 +643,60 @@ server <- function(input, output, session) {
         levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
                    "Friday", "Saturday", "Sunday")
       ))
-    
     p <- ggplot(df, aes(
       x = weekday, y = track_count, fill = weekday,
       text = paste("Weekday:", weekday, "\nTracks Released:", track_count)
     )) +
       geom_col(show.legend = FALSE) +
       labs(
-        title = "New Tracks Released by Weekday (April 2024)",
-        x = "Weekday", y = "Number of Tracks")
+        title = paste("Tracks Released by Weekday"),
+        x = "Weekday", y = "Number of Tracks"
+      ) +
+      theme_minimal()
     ggplotly(p, tooltip = "text")
   })
   
+  # UI: Word selector with only words from the bing lexicon
+  output$lyric_word_selector <- renderUI({
+    req(lyrics_words)
+    
+    bing <- get_sentiments("bing")
+    
+    top_words <- lyrics_words |>
+      filter(!is.na(charted_year)) |>
+      inner_join(bing, by = "word") |>
+      distinct(track_name, word, charted_year) |>
+      count(word, sort = TRUE) |>
+      slice_max(n, n = 10) |>
+      pull(word)
+    
+    checkboxGroupInput("selected_lyric_words", "Choose Top Words:",
+                       choices = top_words,
+                       selected = head(top_words, 5))
+  })
+  
+  # Server: Plot multiple words across years with sentiment facet
+  output$lyric_sentiment_trend <- renderPlotly({
+    req(input$selected_lyric_words)
+    bing <- get_sentiments("bing")
+    
+    plot_data <- lyrics_words |>
+      filter(!is.na(charted_year), word %in% input$selected_lyric_words) |>
+      distinct(track_name, word, charted_year) |>
+      inner_join(bing, by = "word") |>
+      count(charted_year, word, sentiment)
+    req(nrow(plot_data) > 0)
+    p <- ggplot(plot_data, aes(x = charted_year, y = n, color = sentiment)) +
+      geom_line(aes(group = interaction(word, sentiment))) +
+      geom_point() +
+      facet_wrap(~ word, scales = "free_y") +
+      labs(title = "Sentiment Trend of Selected Lyric Words",
+           x = "Year", y = "Count", color = "Sentiment") +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    ggplotly(p)
+  })
+  
+}
 # # Run App ----
 # shinyApp(ui, server)

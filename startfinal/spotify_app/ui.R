@@ -61,7 +61,6 @@ ui <- fluidPage(
         "Track Duration" = "duration",
         "Track Count by Album" = "track_count",
         "Tracks with Features" = "features",
-        "Most Common Words" = "words",
         "New Releases" = "new_releases",
         "Lyric Analysis" = "lyric_analysis")
       )

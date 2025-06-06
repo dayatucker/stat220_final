@@ -30,3 +30,13 @@ genre_choices <- combined_artists_tracks |>
 # Randomly select 3 genres
 selected_genres <- sample(genre_choices, 3)
 
+# Ensure track_name and artist_name match formatting between datasets
+lyrics_words <- lyrics_words |>
+  left_join(
+    combined_artists_tracks |> 
+      select(track_name, artist_name, charted_year) |> 
+      distinct(),
+    by = c("track_name", "artist_name")
+  )
+
+
