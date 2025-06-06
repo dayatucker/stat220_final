@@ -66,14 +66,10 @@ ui <- fluidPage(
         "Lyric Analysis" = "lyric_analysis")
       )
   ),
-  
-  div(id = "content",
-      p(
-        
-        
-        # Random Song Spotlight Section
-        h3("🎵Random Song Spotlight🎵"),
-        uiOutput("song_spotlight"),
-        
-        uiOutput("main_content")
-      )))
+
+div(id = "content",
+    h3("🎵Random Song Spotlight🎵"),
+    uiOutput("song_spotlight"),
+    uiOutput("main_content")
+)
+)

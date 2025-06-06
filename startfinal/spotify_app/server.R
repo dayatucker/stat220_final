@@ -753,7 +753,5 @@ server <- function(input, output, session) {
     ggplotly(p, tooltip = "text")
   })
   
-}
-
-# Run App ----
-shinyApp(ui, server)
+# # Run App ----
+# shinyApp(ui, server)
