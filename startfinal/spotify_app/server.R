@@ -263,15 +263,27 @@ server <- function(input, output, session) {
              )
            },
            "lyric_analysis" = {
-             # Most Common Words in Track Names
-             tabPanel("Analyze Lyrics",
-                      fluidPage(
-                        sidebarLayout(
-                          sidebarPanel(
-                            helpText("Words are colored by sentiment (positive/negative)")
-                          ),
-                          mainPanel(
-                          )
+             
+             tabPanel("New Album Releases 2024",
+                      br(),
+                      tabsetPanel(
+                        tabPanel("tab1",
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                   ),
+                                   mainPanel(
+                                     br(),
+                                   )
+                                 )
+                        ),
+                        tabPanel("tab2",
+                                 sidebarLayout(
+                                   sidebarPanel(
+                                   ),
+                                   mainPanel(
+                                     br(),
+                                   )
+                                 )
                         )
                       )
              )

@@ -14,6 +14,7 @@ library(tidytext)
 combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv")
 combined_albums_tracks <- read_csv("data/combined_albums_tracks_2018_2024.csv")
 new_releases_combined <- read_csv("data/new_releases_combined.csv")
+lyrics_words <- read_csv("stat220_final/startfinal/spotify_app/data/lyrics_words.csv")
 
 # Release year
 combined_artists_tracks <- combined_artists_tracks |>
