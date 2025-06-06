@@ -521,7 +521,7 @@ server <- function(input, output, session) {
       filter(genres == input$selected_genre)
     
     p <- ggplot(genre_data, aes(x = reorder(word, n), y = n, text = str_c("Count: ", n))) +
-      geom_col(fill = "#2c3e50") +
+      geom_col(fill = "#1ed760") +
       coord_flip() +
       labs(
         title = paste("Top 10 Words in", input$selected_genre),
