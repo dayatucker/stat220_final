@@ -1,17 +1,26 @@
 # Spotify Music Explorer 2018-2024
 This repository contains the final project for STAT220.
 
-For this project, we explored lyrical and musical trends using Spotify data from 2018 to 2024. To acquire the data, we used the Spotify API to collect detailed information on tracks, albums, and artists, and an R wrapper for the Genius API to scrape song lyrics. We then wrangled this data by merging datasets, cleaning text (removing punctuation, annotations, etc.), and filtering out both English and Spanish stopwords to prepare the lyrics for analysis. To visualize the data, we created a series of interactive plotly charts in R, including genre-based word frequency plots, sentiment trends over time, and track popularity patterns. Finally, to communicate insights, we built an interactive Shiny dashboard that allows users to explore patterns in music and lyrics across years and genres, making the analysis accessible and engaging. This project aimed to better understand how lyrical content and musical success evolve over time and vary across genres.
+For this project, we explored lyrical and musical trends using Spotify data from 2018 to 2024. To acquire the data, we used the Spotify API (via the {spotifyr} package) to collect detailed information on tracks, albums, and artists, and an R wrapper for the Genius API to scrape song lyrics. We then wrangled this data by merging datasets, cleaning text (removing punctuation and annotations as well as parsing release dates and converted durations), reshaping long data for plotting, creating new features like has_feature, years_since_release, and weekday, and filtering out both English and Spanish stopwords to prepare the lyrics for analysis. Futhermore, we parsed JSON from API into structured data. To visualize the data, we created a series of interactive plotly charts in R, including genre-based word frequency plots, sentiment trends over time, and track popularity patterns. The app is styled in a Spotify-inspired dark theme, complete with spotify colors and tooltip-enhanced plotly visuals for interactivity. Additionally, a "Random Song Spotlight" greets users when the app is launched. We used faceting, conditional filtering, and created custom scales. Finally, to communicate insights, we built an interactive Shiny dashboard, organized into 10 clearly labeled tabs, that allows users to explore patterns in music and lyrics across years and genres, making the analysis accessible and engaging. We organized the app into clearly labeled sections accessible via the left sidebar menu (click ☰ in the top left), wrote clear help text and labels, and included a dynamic title/subtitle system based on user input. This project aimed to better understand how musical success evolve over time and vary across genres.
+
+Key Features to Note:
+Top Artists/Albums tab - selecting a row in the table loads the corresponding Spotify embed, allowing users to instantly listen to top tracks by that artist or album without leaving the app
+Tracks with Features tab — dynamically detects “feat.” or “with” in track names to identify collaborations
+Lyric Analysis tab — uses the bing lexicon to visualize sentiment of common lyrics over time
+App-wide design - consistent dark mode styling and tooltip interactivity
+**ADD MORE**
+
+## Published App Link
 
 ## Files
 - `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization.
 - `lyrics_data_prep.R`:
 - `/spotify_app/`:
   - `/data/`: Directory containing all processed datasets in .csv format
-  - `/www/`:
-  - `global.R`:
-  - `server.R`:
-  - `ui.R`:
+  - `/www/`: Spotify-inspired dark theme styling
+  - `global.R`: 
+  - `server.R`: Server logic for all outputs
+  - `ui.R`: UI layout
 - `main.Rmd`: Main file for graphs and visualizations for the report
 - `final_proj_sketch.Rmd`: Initial project sketch submitted during the proposal phase.
 - `.txt` files: **Need to be deleted from repo**
@@ -89,6 +98,11 @@ Includes:
 - track_name
 - artist_name
 - word
+
+## Navigate Repo:
+Run data_prep.R first to load or update your dataset
+Go to `/spotify_app/` and run `global.R` and `ui.R`
+Launch the app from `server.R`
 
 ## Resources
 - Set up a Shiny app to use shinyjs: (https://www.rdocumentation.org/packages/shinyjs/versions/2.1.0/topics/useShinyjs)
