@@ -34,7 +34,7 @@ server <- function(input, output, session) {
              tabPanel("Info",
                       mainPanel(
                         h3("Info"),
-                        p("Dive into seven years of music trends with our interactive Spotify Explorer app. Whether you're a fan of Latin pop, trap, EDM, or classic rock, this dashboard lets you explore top artists, track popularity, genre evolution, lyrical sentiment, and much more."),
+                        p("Dive into seven years of music trends with our interactive Spotify Explorer app. Whether you're a fan of pop, rap, r&b, or k-pop, this dashboard lets you explore top artists, track popularity, genre evolution, lyrical sentiment, and much more."),
                         p("Use the menu on the left to navigate through each section. From uncovering new album releases and featured collaborations, to analyzing the rise of genres like corridos tumbados and reggaeton, this app turns Spotify data into interactive visual insights."),
                         p("🎧 Start with a Random Song Spotlight above, or jump straight into the trends that shaped streaming between 2018 and 2024.")
                       ))
