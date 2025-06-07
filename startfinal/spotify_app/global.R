@@ -48,8 +48,29 @@ word_counts_by_genre <- lyrics_by_genre |>
 
 top_words_by_genre <- word_counts_by_genre |>
   filter(!is.na(genres)) |>
+  mutate(genres = ifelse(
+    genres == "corrido, corridos tumbados, corridos bélicos, música mexicana, sad sierreño, banda, electro corridos",
+    "corridos",
+    genres
+  )) |>
   group_by(genres) |>
   slice_max(order_by = n, n = 10) |>
   ungroup()
 
+# Sentiment analysis by year
+
+# Load sentiment lexicon
+bing_sentiments <- get_sentiments("bing")
+
+# Join lyrics with year
+lyrics_by_year <- lyrics_words |>
+  inner_join(combined_artists_tracks, by = c("track_name", "artist_name")) |>
+  filter(!is.na(release_year))
+
+# Join with sentiment lexicon
+sentiment_by_year <- lyrics_by_year |>
+  inner_join(bing_sentiments, by = "word") |>
+  count(release_year, sentiment) |>
+  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) |>
+  mutate(net_sentiment = positive - negative)
 

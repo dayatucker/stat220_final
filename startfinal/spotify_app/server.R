@@ -317,7 +317,23 @@ server <- function(input, output, session) {
                             in that genre's lyrics, along with their frequency 
                             counts. ")
                         )
-                      )))
+                      )),
+             tabPanel("Sentiment Analysis by Year",
+                      
+                        mainPanel(
+                          br(),
+                          plotlyOutput("sentiment_year_plot"),
+                          br(),
+                          p("This graph shows the net sentiment of song lyrics 
+                            by release year. Net sentiment is calculated by 
+                            subtracting the number of negative words from the 
+                            number of positive words in the lyrics. Positive 
+                            values indicate more positive language, while negative 
+                            values indicate more negative language.")
+                        )
+                      
+             )
+             )
            }
     )
   })
@@ -516,6 +532,27 @@ server <- function(input, output, session) {
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
     ggplotly(p, tooltip = "text")
   })
+  
+  #Sentiment analysis by year
+  
+  output$sentiment_year_plot <- renderPlotly({
+    
+    p <- ggplot(sentiment_by_year, aes(x = release_year, y = net_sentiment, group = 1,
+                                       text = str_c("Year: ", release_year,
+                                                    "\nPositive: ", positive, 
+                                                    "\nNegative: ", negative,
+                                                    "\nNet Sentiment: ", net_sentiment))) +
+      geom_line(color = "#1ed760", size = 1) +
+      geom_point(color = "black", size = 1) +
+      labs(
+        title = "Net Sentiment of Lyrics by Year",
+        x = "Year",
+        y = "Net Sentiment (positive - negative)"
+      )
+    
+    ggplotly(p, tooltip = "text")
+  })
+  
   
   # Top words by genre
   output$genre_barplot <- renderPlotly({
