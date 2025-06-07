@@ -209,7 +209,9 @@ server <- function(input, output, session) {
                         ),
                         mainPanel(
                           br(),
-                          plotlyOutput("album_tracks_count_plot")
+                          plotlyOutput("album_tracks_count_plot"),
+                          br(),
+                          p("This chart displays the distribution of the number of tracks on charting albums for the selected year.")
                         )
                       )
              )
@@ -523,7 +525,7 @@ server <- function(input, output, session) {
             plot.background = element_rect(fill = "#121212"),
             panel.grid.major = element_line(color = "gray20"))
     
-    ggplotly(p, tooltip = "text") %>% 
+    ggplotly(p, tooltip = "text") |> 
       layout(plot_bgcolor = "#121212", paper_bgcolor = "#121212")
   })
   
@@ -554,8 +556,8 @@ server <- function(input, output, session) {
         plot.background = element_rect(fill = "#121212"),
         panel.grid.major = element_line(color = "gray20")
       )
-    
-    ggplotly(p, tooltip = "text") %>% 
+     
+    ggplotly(p, tooltip = "text") |> 
       layout(plot_bgcolor = "#121212", paper_bgcolor = "#121212")
   })
   
@@ -589,7 +591,7 @@ server <- function(input, output, session) {
   })
   
   
-  # Top words by genre
+  # Top words by genre (in Lyric Analysis Tab)
   output$genre_barplot <- renderPlotly({
     genre_data <- top_words_by_genre |>
       filter(genres == input$selected_genre)
@@ -598,7 +600,7 @@ server <- function(input, output, session) {
       geom_col(fill = "#1ed760") +
       coord_flip() +
       labs(
-        title = paste("Top 10 Words in", input$selected_genre),
+        title = str_c("Top 10 Words in", input$selected_genre),
         x = "Word",
         y = "Frequency"
       ) +
@@ -626,10 +628,11 @@ server <- function(input, output, session) {
       mutate(charted_year = as.factor(charted_year))
     p <- ggplot(df, aes(x = charted_year, y = track_count, fill = genres,
                     text = str_c("Genre: ", genres, "\nYear: ", charted_year, "\nCount: ", track_count))) +
-  geom_col(position = "dodge") +
-  labs(title = "Number of Tracks per Genre by Year",
+      geom_col(position = "dodge") +
+      scale_fill_viridis_d() +
+      labs(title = "Number of Tracks per Genre by Year",
        x = "Year", y = "Unique Track Count", fill = "Genre") +
-  theme(
+      theme(
     plot.background = element_rect(fill = "#121212"),
     panel.background = element_rect(fill = "#121212"),
     legend.background = element_rect(fill = "#121212"),
@@ -717,7 +720,7 @@ ggplotly(p, tooltip = "text")
                                      "\nArtist: ", artist_name,
                                      "\nDuration: ", round(duration_min, 2), " min",
                                      "\nPopularity: ", popularity))) +
-      geom_point(alpha = 0.7, color = "#1ed760") +
+      geom_point(alpha = 0.8, color = "#1ed760") +
       labs(title = ifelse(input$duration_artist == "All",
                           "Popularity vs. Duration for All Artists",
                           str_c("Popularity vs. Duration for ", input$duration_artist)),
@@ -751,7 +754,7 @@ ggplotly(p, tooltip = "text")
                                      "\nArtist: ", track_artists,
                                      "\nDuration: ", round(duration_min, 2), " min",
                                      "\nPopularity: ", track_popularity))) +
-      geom_point(alpha = 0.7, color = "#1ed760") +
+      geom_point(alpha = 0.8, color = "#1ed760") +
       labs(title = ifelse(input$duration_album == "All",
                           "Popularity vs. Duration for All Albums",
                           str_c("Popularity vs. Duration for Album: ", input$duration_album)),
@@ -812,7 +815,20 @@ ggplotly(p, tooltip = "text")
                         text = str_c("Track: ", track_name, "\nArtist Name: ", track_artists, "\nPopularity: ", track_popularity, "\nFeature: ", feature_label))) +
       geom_bar(stat = "identity") +
       coord_flip() +
-      labs(title = paste("Tracks from", input$features_album), x = "Track Name", y = "Popularity", fill = "Has Feature")
+      scale_fill_manual(values = c("With Feature" = "white", "No Feature" = "#1ed760")) +
+      labs(title = str_c("Tracks from", input$features_album), x = "Track Name", y = "Popularity", fill = "Has Feature") +
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        legend.background = element_rect(fill = "#121212"),
+        legend.key = element_rect(fill = "#121212"),
+        legend.text = element_text(color = "white"),
+        legend.title = element_text(color = "white"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20")
+      )
     ggplotly(p, tooltip = "text")
   })
   
@@ -852,6 +868,7 @@ ggplotly(p, tooltip = "text")
   
   output$weekday_track_count_plot <- renderPlotly({
     req(input$release_date_range)
+    
     df <- new_releases_combined |>
       filter(release_date >= input$release_date_range[1],
              release_date <= input$release_date_range[2]) |>
@@ -862,15 +879,26 @@ ggplotly(p, tooltip = "text")
         levels = c("Monday", "Tuesday", "Wednesday", "Thursday", 
                    "Friday", "Saturday", "Sunday")
       ))
+    
+    # Spotify-inspired colors for each weekday
+    weekday_colors <- c(
+      "Monday" = "#1DB954",
+      "Tuesday" = "#1ED760",
+      "Wednesday" = "#23D18B",
+      "Thursday" = "#2D46B9",
+      "Friday" = "#9B59B6"
+    )
+    
     p <- ggplot(df, aes(
       x = weekday, y = track_count, fill = weekday,
-      text = paste("Weekday:", weekday, "\nTracks Released:", track_count)
+      text = str_c("Weekday:", weekday, "\nTracks Released:", track_count)
     )) +
       geom_col(show.legend = FALSE) +
       labs(
         title = "Tracks Released by Weekday",
         x = "Weekday", y = "Number of Tracks"
       ) +
+      scale_fill_manual(values = weekday_colors) +
       theme_minimal() +
       theme(
         plot.background = element_rect(fill = "#121212"),
@@ -880,7 +908,7 @@ ggplotly(p, tooltip = "text")
         plot.title = element_text(color = "white"),
         legend.text = element_text(color = "white"),
         legend.title = element_text(color = "white"),
-        panel.grid.major = element_line(color = "gray20"),
+        panel.grid.major = element_line(color = "gray20")
       )
     
     ggplotly(p, tooltip = "text")
