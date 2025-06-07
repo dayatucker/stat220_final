@@ -10,15 +10,77 @@ library(DT)
 library(plotly)
 library(tidytext)
 
-# Load Data 
+# Load Data ----
 combined_artists_tracks <- read_csv("data/combined_artists_tracks_2018_2024.csv")
 combined_albums_tracks <- read_csv("data/combined_albums_tracks_2018_2024.csv")
 new_releases_combined <- read_csv("data/new_releases_combined.csv")
 lyrics_words <- read_csv("data/lyrics_words.csv")
 
-# Release year
+# Song Spotlight ----
+
+# Parse release year
 combined_artists_tracks <- combined_artists_tracks |>
   mutate(release_year = as.integer(release_year))
+
+# Popularity score
+get_popularity_fire <- function(popularity) {
+  if (popularity >= 95) return("🔥🔥🔥")
+  if (popularity >= 90) return("🔥🔥")
+  if (popularity >= 80) return("🔥")
+  return("")
+}
+
+# Top Artist/Albums Tab ----
+# Filtering logic — could move to global if reused across tabs
+get_filtered_artists_year <- function(data, year) {
+  data |>
+    filter(charted_year == year) |>
+    group_by(artist_name, genres, artist_id) |>
+    summarise(
+      avg_popularity = round(mean(popularity, na.rm = TRUE), 1),
+      total_tracks = n(), .groups = "drop"
+    ) |>
+    arrange(desc(avg_popularity))
+}
+
+get_filtered_artists <- function(data, year) {
+  data |>
+    filter(charted_year == year) |>
+    group_by(artist_name, genres) |>
+    summarise(
+      avg_popularity = round(mean(popularity, na.rm = TRUE), 1),
+      .groups = "drop"
+    ) |>
+    arrange(desc(avg_popularity))
+}
+
+get_filtered_albums_year <- function(data, year) {
+  data |>
+    filter(charted_year == year) |>
+    group_by(album_name, album_type, album_id) |>
+    summarise(
+      total_tracks = max(total_tracks),
+      release_date = first(release_date),
+      avg_track_duration_sec = round(mean(track_duration_ms, na.rm = TRUE) / 1000, 1),
+      .groups = "drop"
+    ) |>
+    arrange(release_date)
+}
+
+get_filtered_albums <- function(data, year) {
+  data |>
+    filter(charted_year == year) |>
+    group_by(album_name) |>
+    summarise(
+      total_tracks = max(total_tracks),
+      release_date = first(release_date),
+      avg_track_duration_sec = round(mean(track_duration_ms, na.rm = TRUE) / 1000, 1),
+      .groups = "drop"
+    ) |>
+    arrange(release_date)
+}
+
+# Track Genre Tab ----
 
 # Get all unique genres
 genre_choices <- combined_artists_tracks |>
@@ -30,6 +92,8 @@ genre_choices <- combined_artists_tracks |>
 # Randomly select 3 genres
 selected_genres <- sample(genre_choices, 3)
 
+# Lyric Analysis Tab ----
+
 # Ensure track_name and artist_name match formatting between datasets
 lyrics_words <- lyrics_words |>
   left_join(
@@ -39,7 +103,7 @@ lyrics_words <- lyrics_words |>
     by = c("track_name", "artist_name")
   )
 
-# top 10 most common words by genre
+# Top 10 most common words by genre
 lyrics_by_genre <- lyrics_words |>
   inner_join(combined_artists_tracks, by = c("track_name", "artist_name"))
 
@@ -56,8 +120,6 @@ top_words_by_genre <- word_counts_by_genre |>
   group_by(genres) |>
   slice_max(order_by = n, n = 10) |>
   ungroup()
-
-# Sentiment analysis by year
 
 # Load sentiment lexicon
 bing_sentiments <- get_sentiments("bing")
