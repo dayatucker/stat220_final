@@ -30,12 +30,11 @@ Finally, to communicate insights, we built an interactive Shiny dashboard, organ
   - `global.R`: Loads data and shared functions used by both UI and server components
   - `server.R`: Server logic for all outputs
   - `ui.R`: Defines the user interface layout and inputs
-- `main.Rmd`: Main file for graphs and visualizations for the report
 - `final_proj_sketch.Rmd`: Initial project sketch submitted during the proposal phase
 
 ## Datasets
 #### `all_tracks_*.csv`
-This contains track-level data for each year from 2018 to 2024 with each file containing one row per track. Tracks are associated with artists released on Spotify and it provides core data on song popularity, duration, explicitness. This was obtained via the Spotify Web API.
+This contains track-level data for each year from 2018 to 2024, with one row per track. Tracks are associated with artists released on Spotify and it provides core data on song popularity, duration, explicitness. This was obtained via the Spotify Web API.
 
 - Includes:
   - track_name: Title of the song
@@ -48,7 +47,7 @@ This contains track-level data for each year from 2018 to 2024 with each file co
   - year: Year the track charted
 
 #### `combined_artists_tracks_2018_2024.csv` 
-This merges all yearly track-level files from 2018 to 2024 into a single dataset. Each row links songs to their artists and genre tags. This was originally obtained via the Spotify Web API and bound together to support cross/year analysis of music trends, artist performance, and content characteristics.
+This merges all yearly track-level files from 2018 to 2024 into a single dataset. The dataset contains the top artists streamed each year along with their top 10 songs. Each row links songs to their artists and genre tags. This was originally obtained via the Spotify Web API and bound together to support cross/year analysis of music trends, artist performance, and content characteristics.
 
 - Includes:
   - track_name: Title of the track
@@ -65,7 +64,7 @@ This merges all yearly track-level files from 2018 to 2024 into a single dataset
   - years_since_release: Number of years between release and charting
 
 #### `combined_albums_tracks_2018_2024.csv`
-This is a aggregated dataset joining track and album-level info across all years (2018-2024). Songs grouped by album and artist and it enables information about album structure (like the number of tracks), duration, and feature patterns. This was obtained via the Spotify Web API.
+This is a aggregated dataset joining track and album-level info across all years (2018-2024). It contains songs from the top albums streamed globally each year. Songs are grouped by album and artist and it enables information about album structure (like the number of tracks), duration, and feature patterns. This was obtained via the Spotify Web API.
 
 - Includes:
   - album_id: Unique Spotify ID for the album
