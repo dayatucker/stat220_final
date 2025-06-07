@@ -13,8 +13,8 @@ App-wide design - consistent dark mode styling and tooltip interactivity
 ## Published App Link
 
 ## Files
-- `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization.
-- `lyrics_data_prep.R`:
+- `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization
+- `lyrics_data_prep.R`: Script extracts and cleans song lyrics from the Genius API to enable textual and sentiment analysis of lyrics associated with Spotify's top charting tracks
 - `/spotify_app/`:
   - `/data/`: Directory containing all processed datasets in .csv format
   - `/www/`: Spotify-inspired dark theme styling
@@ -22,11 +22,11 @@ App-wide design - consistent dark mode styling and tooltip interactivity
   - `server.R`: Server logic for all outputs
   - `ui.R`: UI layout
 - `main.Rmd`: Main file for graphs and visualizations for the report
-- `final_proj_sketch.Rmd`: Initial project sketch submitted during the proposal phase.
+- `final_proj_sketch.Rmd`: Initial project sketch submitted during the proposal phase
 - `.txt` files: **Need to be deleted from repo**
 
 ## Datasets
-#### `all_tracks_*.csv`: Multiple files, each containing track-level data for a specific year (2018–2024)
+#### `all_tracks_*.csv`: Multiple files, each containing track-level data for a specific year (2018–2024).
 Includes:
 - track_name
 - album_name
@@ -37,7 +37,7 @@ Includes:
 - artist_name
 - year
 
-#### `combined_artists_tracks_2018_2024.csv`: Artist-level summary generated from track data
+#### `combined_artists_tracks_2018_2024.csv`: Artist-level summary generated from track data.
 Includes:
 - track_name
 - track_id
@@ -52,7 +52,7 @@ Includes:
 - charted_year
 - years_since_release
 
-#### `combined_albums_tracks_2018_2024.csv`: Aggregated dataset joining track and album-level info across all years (2018-2024)
+#### `combined_albums_tracks_2018_2024.csv`: Aggregated dataset joining track and album-level info across all years (2018-2024).
 Includes:
 - album_id
 - album_name
@@ -87,20 +87,20 @@ Includes:
 - album_url
 - charted_year
 
-#### `all_track_lyrics.csv`: 
+#### `all_track_lyrics.csv`: One row per song with cleaned full lyrics.
 Includes:
 - track_name
 - artist_name
 - lyrics
 
-#### `lyrics_words.csv`: 
+#### `lyrics_words.csv`: One row per word (token) per song for word-level analysis.
 Includes:
 - track_name
 - artist_name
 - word
 
 ## Navigate Repo:
-Run data_prep.R first to load or update your dataset
+Run `data_prep.R` and `lyrics_data_prep.R` first to load or update your dataset (optional and will take a while)???? **Does she need to?***
 Go to `/spotify_app/` and run `global.R` and `ui.R`
 Launch the app from `server.R`
 
