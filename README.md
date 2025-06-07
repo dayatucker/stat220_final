@@ -5,7 +5,11 @@ For this project, we explored lyrical and musical trends using Spotify data from
 
 ## Files
 - `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization.
-- `app.R`:
+- `lyrics_data_prep.R`:
+- `/spotify_app/`:
+  - `global.R`:
+  - `server.R`:
+  - `ui.R`:
 - `main.Rmd`: Main file for graphs and visualizations for the report
 - `/data/`: Directory containing all processed datasets in .csv format
 - `/www/`:
@@ -52,7 +56,7 @@ Includes:
 - track_number
 - track_artists
 - track_duration_ms
-- track_explicit
+- track_explicit (True/False)
 - charted_year
 - features
 
@@ -64,7 +68,7 @@ Includes:
 - track_number
 - track_artists
 - track_duration_ms
-- track_explicit
+- track_explicit (True/False)
 - release_date
 - total_tracks
 - popularity
