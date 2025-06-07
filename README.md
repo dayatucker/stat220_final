@@ -116,6 +116,8 @@ Launch the app from `server.R`
 - Spotify Wrapped Links: (https://newsroom.spotify.com/?s=wrapped)
 - Lyrics: ([GitHub.com/ewenme/geniusr](https://github.com/ewenme/geniusr)) and (https://docs.genius.com/)
 - Spotify Color Scheme: (https://developer.spotify.com/documentation/design#using-our-logo)
+- R Color Palletes: (https://www.nceas.ucsb.edu/sites/default/files/2020-04/colorPaletteCheatsheet.pdf)
+- Amanda Luby's Slides
 
 ## Authors
 - Aubrey Tran
