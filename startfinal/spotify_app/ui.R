@@ -30,7 +30,7 @@ ui <- fluidPage(
                 font-family: 'SpotifyMixBold';
                 src: url('/spotifymixbold.woff') format('woff');
             }
-            html body {
+            html * {
                 font-family: 'SpotifyMix', Arial, sans-serif !important;
             }
             html h2, html h3, html h4, html h5 {
