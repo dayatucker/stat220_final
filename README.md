@@ -105,8 +105,12 @@ Includes:
 - word
 
 ## Navigate Repo:
-Run `data_prep.R` and `lyrics_data_prep.R` first to load or update your dataset (optional and will take a while)???? **Does she need to?***
+Run `data_prep.R` and `lyrics_data_prep.R` first to load or update your dataset (optional and will take a while)???? 
+
+**Does she need to?***
+
 Go to `/spotify_app/` and run `global.R` and `ui.R`
+
 Launch the app from `server.R`
 
 ## Resources
