@@ -34,7 +34,9 @@ server <- function(input, output, session) {
              tabPanel("Info",
                       mainPanel(
                         h3("Info"),
-                        p("Very informative text yay!")
+                        p("Dive into six years of music trends with our interactive Spotify Explorer app. Whether you're a fan of Latin pop, trap, EDM, or classic rock, this dashboard lets you explore top artists, track popularity, genre evolution, lyrical sentiment, and much more."),
+                        p("Use the menu on the left to navigate through each section. From uncovering new album releases and featured collaborations, to analyzing the rise of genres like corridos tumbados and reggaeton, this app turns Spotify data into interactive visual insights."),
+                        p("🎧 Start with a Random Song Spotlight above, or jump straight into the trends that shaped streaming between 2018 and 2024.")
                       ))
            },
            "artists" = {
@@ -372,7 +374,7 @@ server <- function(input, output, session) {
       filter(charted_year == input$selected_year) |>
       group_by(artist_name, genres) |>
       summarise(avg_popularity = round(mean(popularity, na.rm = TRUE), 1),
-                total_tracks = n(), .groups = "drop") |>
+                .groups = "drop") |>
       arrange(desc(avg_popularity))
   })
   
