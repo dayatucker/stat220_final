@@ -113,7 +113,7 @@ Includes:
 ## Navigate Repo:
 1. Go to `startfinal`folder and select `/spotify_app/` folder.
 2. Open `global.R`,`ui.R`, `server.R`.
-3. Select all code from `global.R` and press command return.
+3. Select all code from `global.R` and press Command + Return.
 4. Do same for `ui.R`.
 6. Launch the app from `server.R`.
 
