@@ -1,5 +1,6 @@
 # Spotify Music Explorer 2018-2024 🎧
 This repository contains the final project for STAT220.
+
 [View the published app](https://nicholasjchang.shinyapps.io/spotify_app/)
 
 For this project, we explored lyrical and musical trends using Spotify data from 2018 to 2024. To acquire the data, we used the Spotify API (via the {spotifyr} package) to collect detailed information on tracks, albums, and artists. We also used an R wrapper for the Genius API to scrape song lyrics. We then wrangled this data by merging datasets, cleaning text (removing punctuation and annotations as well as parsing release dates and converted durations), reshaping long data for plotting, creating new features, and filtering out both English and Spanish stopwords for lyrical analysis. Futhermore, we parsed JSON from API into structured data. 
