@@ -501,6 +501,7 @@ server <- function(input, output, session) {
     req(input$selected_artist)
     df <- combined_artists_tracks |>
       filter(charted_year == input$track_year, artist_name == input$selected_artist)
+   
     p <- ggplot(df, aes(x = reorder(track_name, popularity), y = popularity, fill = as.factor(explicit),
                         text = str_c(
                           "Track: ", track_name,
@@ -508,29 +509,54 @@ server <- function(input, output, session) {
                           "\nExplicit: ", ifelse(explicit, "Yes", "No")
                         ))) +
       geom_bar(stat = "identity") +
-      scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#191414")) +
+      scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "white")) +  # TRUE is white now
       labs(title = str_c("Tracks by ", input$selected_artist),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    ggplotly(p, tooltip = "text")
+      theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "white"),
+            axis.text.y = element_text(color = "white"),
+            axis.title = element_text(color = "white"),
+            plot.title = element_text(color = "white"),
+            legend.text = element_text(color = "white"),
+            legend.title = element_text(color = "white"),
+            legend.background = element_rect(fill = "#121212"),
+            panel.background = element_rect(fill = "#121212"),
+            plot.background = element_rect(fill = "#121212"),
+            panel.grid.major = element_line(color = "gray20"))
+    
+    ggplotly(p, tooltip = "text") %>% 
+      layout(plot_bgcolor = "#121212", paper_bgcolor = "#121212")
   })
   
   output$album_tracks_plot <- renderPlotly({
     req(input$selected_album)
     df <- combined_albums_tracks |>
       filter(charted_year == input$track_year, album_name == input$selected_album)
-    p <- ggplot(df, aes(x = reorder(track_name, track_popularity), y = track_popularity, fill = as.factor(track_explicit),
+   
+     p <- ggplot(df, aes(x = reorder(track_name, track_popularity), y = track_popularity, fill = as.factor(track_explicit),
                         text = str_c(
                           "Track: ", track_name,
                           "\nPopularity: ", track_popularity,
                           "\nExplicit: ", ifelse(track_explicit, "Yes", "No")
                         ))) +
       geom_bar(stat = "identity") +
-      scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#191414")) +
+      scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "white")) +
       labs(title = str_c("Tracks from Album: ", input$selected_album),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    ggplotly(p, tooltip = "text")
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1, color = "white"),
+        axis.text.y = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        legend.text = element_text(color = "white"),
+        legend.title = element_text(color = "white"),
+        legend.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        plot.background = element_rect(fill = "#121212"),
+        panel.grid.major = element_line(color = "gray20")
+      )
+    
+    ggplotly(p, tooltip = "text") %>% 
+      layout(plot_bgcolor = "#121212", paper_bgcolor = "#121212")
   })
   
   #Sentiment analysis by year
@@ -542,12 +568,21 @@ server <- function(input, output, session) {
                                                     "\nPositive: ", positive, 
                                                     "\nNegative: ", negative,
                                                     "\nNet Sentiment: ", net_sentiment))) +
-      geom_line(color = "#1ed760", size = 1) +
-      geom_point(color = "black", size = 1) +
+      geom_line(color = "#1ed760", size = 0.8) +
+      geom_point(color = "white", size = 1) +
       labs(
         title = "Net Sentiment of Lyrics by Year",
         x = "Year",
         y = "Net Sentiment (positive - negative)"
+      ) +
+      theme_minimal() +
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20")
       )
     
     ggplotly(p, tooltip = "text")
@@ -567,7 +602,15 @@ server <- function(input, output, session) {
         x = "Word",
         y = "Frequency"
       ) +
-      theme_minimal()
+      theme_minimal() +
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20"),
+      )
     
     ggplotly(p, tooltip = "text")
   })
@@ -582,11 +625,24 @@ server <- function(input, output, session) {
       count(genres, charted_year, name = "track_count") |>
       mutate(charted_year = as.factor(charted_year))
     p <- ggplot(df, aes(x = charted_year, y = track_count, fill = genres,
-                        text = str_c("Genre: ", genres, "\nYear: ", charted_year, "\nCount: ", track_count))) +
-      geom_col(position = "dodge") +
-      labs(title = "Number of Tracks per Genre by Year",
-           x = "Year", y = "Unique Track Count", fill = "Genre")
-    ggplotly(p, tooltip = "text")
+                    text = str_c("Genre: ", genres, "\nYear: ", charted_year, "\nCount: ", track_count))) +
+  geom_col(position = "dodge") +
+  labs(title = "Number of Tracks per Genre by Year",
+       x = "Year", y = "Unique Track Count", fill = "Genre") +
+  theme(
+    plot.background = element_rect(fill = "#121212"),
+    panel.background = element_rect(fill = "#121212"),
+    legend.background = element_rect(fill = "#121212"),
+    legend.key = element_rect(fill = "#121212"),
+    legend.text = element_text(color = "white"),
+    legend.title = element_text(color = "white"),
+    axis.text = element_text(color = "white"),
+    axis.title = element_text(color = "white"),
+    plot.title = element_text(color = "white"),
+    panel.grid.major = element_line(color = "gray20")
+  )
+  
+ggplotly(p, tooltip = "text")
   })
   
   output$genre_table <- DT::renderDataTable({
@@ -619,7 +675,16 @@ server <- function(input, output, session) {
     p <- ggplot(df, aes(x = years_since_release, y = popularity, text = hover_text)) +
       geom_point(alpha = 0.6, color = "#1ed760") +
       labs(title = "Track Popularity vs. Years Since Release",
-           x = "Years Since Release", y = "Popularity")
+           x = "Years Since Release", y = "Popularity") +
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20")
+      )
+    
     ggplotly(p, tooltip = "text")
   })
   
@@ -656,7 +721,16 @@ server <- function(input, output, session) {
       labs(title = ifelse(input$duration_artist == "All",
                           "Popularity vs. Duration for All Artists",
                           str_c("Popularity vs. Duration for ", input$duration_artist)),
-           x = "Track Duration (Minutes)", y = "Popularity")
+           x = "Track Duration (Minutes)", y = "Popularity") +
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20") 
+      )
+    
     ggplotly(p, tooltip = "text")
   })
   
@@ -681,7 +755,16 @@ server <- function(input, output, session) {
       labs(title = ifelse(input$duration_album == "All",
                           "Popularity vs. Duration for All Albums",
                           str_c("Popularity vs. Duration for Album: ", input$duration_album)),
-           x = "Track Duration (Minutes)", y = "Popularity")
+           x = "Track Duration (Minutes)", y = "Popularity") +
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20")
+      )
+    
     ggplotly(p, tooltip = "text")
   })
   
@@ -694,10 +777,22 @@ server <- function(input, output, session) {
       summarise(num_tracks = n(), .groups = "drop") |>
       arrange(desc(num_tracks)) |>
       mutate(hover_text = str_c("Album: ", album_name, "\nArtist(s): ", track_artists, "\nTracks: ", num_tracks))
+   
     p <- ggplot(album_counts, aes(x = reorder(album_name, num_tracks), y = num_tracks, text = hover_text)) +
-      geom_bar(stat = "identity", fill = "#1ed760") + coord_flip() +
-      labs(title = str_c("Number of Tracks per Album in ", input$tracks_year), x = "Album Name", y = "Number of Tracks") +
-      theme(axis.text.y = element_text(angle = 45, hjust = 1))
+      geom_bar(stat = "identity", fill = "#1ed760") +
+      coord_flip() +
+      labs(title = str_c("Number of Tracks per Album in ", input$tracks_year),
+           x = "Album Name", y = "Number of Tracks") +
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20"),
+        axis.text.y = element_text(angle = 45, hjust = 1)
+      )
+    
     ggplotly(p, tooltip = "text")
   })
   
@@ -742,7 +837,16 @@ server <- function(input, output, session) {
       geom_point(alpha = 0.6, color = "#1ed760") +
       labs(title = "Popularity vs. Release Date", x = "Release Date", y = "Popularity") +
       scale_x_date(date_breaks = "1 day", date_labels = "%m-%d-%y") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20"),
+        axis.text.x = element_text(angle = 45, hjust = 1)
+      )
+    
     ggplotly(p, tooltip = "text")
   })
   
@@ -764,10 +868,21 @@ server <- function(input, output, session) {
     )) +
       geom_col(show.legend = FALSE) +
       labs(
-        title = paste("Tracks Released by Weekday"),
+        title = "Tracks Released by Weekday",
         x = "Weekday", y = "Number of Tracks"
       ) +
-      theme_minimal()
+      theme_minimal() +
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "white"),
+        axis.title = element_text(color = "white"),
+        plot.title = element_text(color = "white"),
+        legend.text = element_text(color = "white"),
+        legend.title = element_text(color = "white"),
+        panel.grid.major = element_line(color = "gray20"),
+      )
+    
     ggplotly(p, tooltip = "text")
   })
   
