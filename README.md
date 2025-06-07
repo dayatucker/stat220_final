@@ -17,6 +17,8 @@ App-wide design – Features a cohesive dark mode Spotify theme, along with inte
 
 ## Published App Link
 
+https://nicholasjchang.shinyapps.io/spotify_app/
+
 ## Files
 - `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization
 - `lyrics_data_prep.R`: Script extracts and cleans song lyrics from the Genius API to enable textual and sentiment analysis of lyrics associated with Spotify's top charting tracks
