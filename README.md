@@ -1,23 +1,24 @@
-# Spotify Music Explorer 2018-2024
+# Spotify Music Explorer 2018-2024 🎧
 This repository contains the final project for STAT220.
+[View the published app](https://nicholasjchang.shinyapps.io/spotify_app/)
 
-For this project, we explored lyrical and musical trends using Spotify data from 2018 to 2024. To acquire the data, we used the Spotify API (via the {spotifyr} package) to collect detailed information on tracks, albums, and artists, and an R wrapper for the Genius API to scrape song lyrics. We then wrangled this data by merging datasets, cleaning text (removing punctuation and annotations as well as parsing release dates and converted durations), reshaping long data for plotting, creating new features like has_feature, years_since_release, and weekday, and filtering out both English and Spanish stopwords to prepare the lyrics for analysis. Futhermore, we parsed JSON from API into structured data. To visualize the data, we created a series of interactive plotly charts in R, including genre-based word frequency plots, sentiment trends over time, and track popularity patterns. The app is styled in a Spotify-inspired dark theme, complete with spotify colors and tooltip-enhanced plotly visuals for interactivity. Additionally, a "Random Song Spotlight" greets users when the app is launched. We used faceting, conditional filtering, and created custom scales. Finally, to communicate insights, we built an interactive Shiny dashboard, organized into 10 clearly labeled tabs, that allows users to explore patterns in music and lyrics across years and genres, making the analysis accessible and engaging. We organized the app into clearly labeled sections accessible via the left sidebar menu (click ☰ in the top left), wrote clear help text and labels, and included a dynamic title/subtitle system based on user input. This project aimed to better understand how musical success evolve over time and vary across genres.
+For this project, we explored lyrical and musical trends using Spotify data from 2018 to 2024. To acquire the data, we used the Spotify API (via the {spotifyr} package) to collect detailed information on tracks, albums, and artists. We also used an R wrapper for the Genius API to scrape song lyrics. We then wrangled this data by merging datasets, cleaning text (removing punctuation and annotations as well as parsing release dates and converted durations), reshaping long data for plotting, creating new features, and filtering out both English and Spanish stopwords for lyrical analysis. Futhermore, we parsed JSON from API into structured data. 
 
-Key Features to Note:
+To visualize the data, we created a series of interactive plotly charts in R, including genre-based word frequency plots, sentiment trends over time, and track popularity patterns. The app is styled in a Spotify-inspired dark theme, complete with spotify colors and tooltip-enhanced plotly visuals for interactivity. Additionally, a "Random Song Spotlight" greets users when the app is launched. We used faceting, conditional filtering, and created custom scales. 
 
-Top Artists/Albums tab – Selecting a row in the table dynamically loads the corresponding Spotify embed, allowing users to instantly preview top tracks by that artist or album without leaving the app.
+Finally, to communicate insights, we built an interactive Shiny dashboard, organized into 10 clearly labeled tabs, that allows users to explore patterns in music and lyrics across years and genres, making the analysis accessible and engaging. We organized the app into clearly labeled sections accessible via the left sidebar menu (click ☰ in the top left), wrote clear help text and labels, and included a dynamic title/subtitle system based on user input. This project aimed to better understand how musical success evolve over time and vary across genres.
 
-Track Duration tab – Visualizes the relationship between track length and popularity through an interactive scatterplot. Users can filter by artist to see whether shorter or longer songs tend to perform better.
+### Key Features to Note:
 
-Tracks with Features tab – Detects collaborations by identifying phrases like “feat.” or “with” in track names, making it easy to explore featured tracks across albums.
+- **Top Artists/Albums tab** – Selecting a row in the table dynamically loads the corresponding Spotify embed, allowing users to instantly preview top tracks by that artist or album without leaving the app.
 
-Lyric Analysis tab – Performs sentiment analysis on lyrics using the bing lexicon, highlighting how the emotional tone of common words has shifted over time.
+- **Track Duration tab** – Visualizes the relationship between track length and popularity through an interactive scatterplot. Users can filter by artist to see whether shorter or longer songs tend to perform better.
 
-App-wide design – Features a cohesive dark mode Spotify theme, along with interactive tooltips.
+- **Tracks with Features tab** – Detects collaborations by identifying phrases like “feat.” or “with” in track names, making it easy to explore featured tracks across albums.
 
-## Published App Link
+- **Lyric Analysis tab** – Performs sentiment analysis on lyrics using the bing lexicon, highlighting how the emotional tone of common words has shifted over time.
 
-https://nicholasjchang.shinyapps.io/spotify_app/
+- **App-wide design** – Features a cohesive dark mode Spotify theme, along with interactive tooltips.
 
 ## Files
 - `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization
