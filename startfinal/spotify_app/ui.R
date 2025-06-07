@@ -20,6 +20,7 @@ ui <- fluidPage(
         });
       });
     ")),
+    # Embed custom Spotify-style fonts
     tags$style(HTML("
             @font-face {
                 font-family: 'SpotifyMix';
@@ -36,12 +37,9 @@ ui <- fluidPage(
                 font-family: 'SpotifyMixBold', Arial, sans-serif !important;
             }
         "))
-    #tags$link(rel = "stylesheet", type = "text/css", href = "www/styles.css")
-    
   ),
   
-  
-  # Menu
+  # Header
   div(
     class = "header-row",
     actionButton("toggleSidebar", "\u2630", 
@@ -49,6 +47,7 @@ ui <- fluidPage(
     h3("Spotify Music Explorer 2018-2024", style = "display: inline-block; margin-left: 10px; vertical-align: middle;")
   ),
   
+  # Sidebar navigation menu
   div(id = "sidebar",
       h3("Menu"),
       br(),
@@ -66,9 +65,10 @@ ui <- fluidPage(
       )
   ),
 
-div(id = "content",
-    h3("🎵Random Song Spotlight🎵"),
-    uiOutput("song_spotlight"),
-    uiOutput("main_content")
+  # Main content area of the app
+  div(id = "content",
+      h3("🎵Random Song Spotlight🎵"),
+      uiOutput("song_spotlight"),
+      uiOutput("main_content")
 )
 )
