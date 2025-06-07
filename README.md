@@ -22,110 +22,102 @@ Finally, to communicate insights, we built an interactive Shiny dashboard, organ
 - **App-wide design** – Features a cohesive dark mode Spotify theme, along with interactive tooltips.
 
 ## Files
-- `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization
+- `data_prep.R`: Script for cleaning and wrangling raw track datasets. Produces combined datasets for analysis and visualization of track data
 - `lyrics_data_prep.R`: Script extracts and cleans song lyrics from the Genius API to enable textual and sentiment analysis of lyrics associated with Spotify's top charting tracks
-- `/spotify_app/`:
+- `/spotify_app/`: Directory containing the full structure of the Shiny app
   - `/data/`: Directory containing all processed datasets in .csv format
   - `/www/`: Spotify-inspired dark theme styling
-  - `global.R`: 
+  - `global.R`: Loads data and shared functions used by both UI and server components
   - `server.R`: Server logic for all outputs
-  - `ui.R`: UI layout
+  - `ui.R`: Defines the user interface layout and inputs
 - `main.Rmd`: Main file for graphs and visualizations for the report
 - `final_proj_sketch.Rmd`: Initial project sketch submitted during the proposal phase
-- `.txt` files: **Need to be deleted from repo**
 
 ## Datasets
-#### `all_tracks_*.csv`: 
+#### `all_tracks_*.csv`
 This contains track-level data for each year from 2018 to 2024 with each file containing one row per track. Tracks are associated with artists released on Spotify and it provides core data on song popularity, duration, explicitness. This was obtained via the Spotify Web API.
 
 - Includes:
-  - track_name
-  - album_name
-  - popularity
-  - track_duration_ms
-  - explicit
-  - artist_id
-  - artist_name
-  - year
+  - track_name: Title of the song
+  - album_name: Album where the track appears
+  - popularity: Spotify-calculated popularity score (0–100)
+  - track_duration_ms: Duration of the track in milliseconds
+  - explicit: Whether the track is marked explicit (TRUE/FALSE)
+  - artist_id: Unique Spotify ID for the artist
+  - artist_name: Name of the artist
+  - year: Year the track charted
 
-#### `combined_artists_tracks_2018_2024.csv`: 
-This contains artist-level summary generated from track data. Each row links songs to their artists and genre tags. It provides answers about genre evolution and changes in artist popularity over time. This was obtained via the Spotify Web API.
+#### `combined_artists_tracks_2018_2024.csv` 
+This merges all yearly track-level files from 2018 to 2024 into a single dataset. Each row links songs to their artists and genre tags. This was originally obtained via the Spotify Web API and bound together to support cross/year analysis of music trends, artist performance, and content characteristics.
 
 - Includes:
-  - track_name
-  - track_id
-  - album_name
-  - popularity
-  - track_duration_ms
-  - explicit
-  - artist_id
-  - release_year
-  - artist_name
-  - genres
-  - charted_year
-  - years_since_release
+  - track_name: Title of the track
+  - track_id: Unique Spotify ID for the track
+  - album_name: Album the track appears on
+  - popularity: Spotify-calculated popularity score (0–100)
+  - track_duration_ms: Duration of the track in milliseconds
+  - explicit: Whether the track is marked explicit (TRUE/FALSE)
+  - artist_id: Unique Spotify ID for the artist
+  - release_year: Year the track was originally released
+  - artist_name: Name of the artist
+  - genres: Comma-separated list of genres associated with the artist
+  - charted_year: Year the track appeared on Spotify’s charts
+  - years_since_release: Number of years between release and charting
 
-#### `combined_albums_tracks_2018_2024.csv`: 
+#### `combined_albums_tracks_2018_2024.csv`
 This is a aggregated dataset joining track and album-level info across all years (2018-2024). Songs grouped by album and artist and it enables information about album structure (like the number of tracks), duration, and feature patterns. This was obtained via the Spotify Web API.
 
 - Includes:
-  - album_id
-  - album_name
-  - release_date
-  - total_tracks
-  - popularity
-  - album_type
-  - track_id
-  - track_name
-  - track_number
-  - track_artists
-  - track_duration_ms
-  - track_explicit (True/False)
-  - charted_year
-  - features
+  - album_id: Unique Spotify ID for the album
+  - album_name: Album the track appears on
+  - release_date: Year the track was originally released
+  - total_tracks: Total number of tracks on the album
+  - popularity: Spotify-calculated popularity score (0–100)
+  - album_type: Type of album
+  - track_id: Unique Spotify ID for the track
+  - track_name: Title of the track
+  - track_number: Position of the track on the album
+  - track_artists: Artists associated with the track
+  - track_duration_ms: Duration of the track in milliseconds
+  - track_explicit: Whether the track is marked explicit (TRUE/FALSE)
+  - charted_year: Year the track charted
+  - features: Indicates if the track includes a featured artist
 
-#### `new_releases_combined.csv`:
+#### `new_releases_combined.csv`
 This contains all new album and track releases in 2024, including both main and featured artists. It focuses on April 2024 only, ideal for understanding the release trends. This was obtained via the Spotify Web API.
 
 - Includes:
-  - album_id
-  - track_id
-  - track_name
-  - track_number
-  - track_artists
-  - track_duration_ms
-  - track_explicit (True/False)
-  - release_date
-  - total_tracks
-  - popularity
-  - album_type
-  - album_name
-  - artist_name
-  - album_url
-  - charted_year
+  - album_id: Unique Spotify ID for the album
+  - track_id: Unique Spotify ID for the track
+  - track_name: Name of the track
+  - track_number: Position of the track on the album
+  - track_artists: Artists featured on the track
+  - track_duration_ms: Duration of the track in milliseconds
+  - track_explicit: Indicates if the track is explicit (TRUE/FALSE)
+  - release_date: Official release date of the album
+  - total_tracks: Total number of tracks on the album
+  - popularity: Spotify-calculated popularity score (0–100)
+  - album_type: Type of album
+  - album_name: Title of album
+  - artist_name: Primary artist associated with the album
+  - album_url: Link to the album on Spotify
+  - charted_year: Year the track charted
 
-#### `all_track_lyrics.csv`: 
+#### `all_track_lyrics.csv` 
 This contains full, cleaned lyrics for each track (one row per song). It is tied to tracks spanning 2018–2024; used for analyzing lyrical trends across time.
 
 - Includes:
-  - track_name
-  - artist_name
-  - lyrics
+  - track_name: Title of the track
+  - artist_name: Name of the artist
+  - lyrics: Full cleaned lyrics text for the track
 
-#### `lyrics_words.csv`: 
+#### `lyrics_words.csv`
 This contains a tokenized version of the lyrics dataset — one row per word per track. Supports word frequency analysis, sentiment analysis, and tracking word trends over time.
 
 - Includes:
-  - track_name
-  - artist_name
-  - word
-
-## Navigate Repo:
-1. Go to `startfinal`folder and select `/spotify_app/` folder.
-2. Open `global.R`,`ui.R`, `server.R`.
-3. Select all code from `global.R` and press Command + Return.
-4. Do same for `ui.R`.
-6. Launch the app from `server.R`.
+  - track_name: Title of the track
+  - artist_name: Name of the artist
+  - word: A single tokenized word from the song's lyrics
 
 ## Resources
 - Set up a Shiny app to use shinyjs: (https://www.rdocumentation.org/packages/shinyjs/versions/2.1.0/topics/useShinyjs)
