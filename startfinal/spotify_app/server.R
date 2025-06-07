@@ -476,15 +476,15 @@ server <- function(input, output, session) {
                           "\nExplicit: ", ifelse(explicit, "Yes", "No")
                         ))) +
       geom_bar(stat = "identity") +
-      scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "white")) +  # TRUE is white now
+      scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#FFFFFF")) +
       labs(title = str_c("Tracks by ", input$selected_artist),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "white"),
-            axis.text.y = element_text(color = "white"),
-            axis.title = element_text(color = "white"),
-            plot.title = element_text(color = "white"),
-            legend.text = element_text(color = "white"),
-            legend.title = element_text(color = "white"),
+      theme(axis.text.x = element_text(angle = 45, hjust = 1, color = "#FFFFFF"),
+            axis.text.y = element_text(color = "#FFFFFF"),
+            axis.title = element_text(color = "#FFFFFF"),
+            plot.title = element_text(color = "#FFFFFF"),
+            legend.text = element_text(color = "#FFFFFF"),
+            legend.title = element_text(color = "#FFFFFF"),
             legend.background = element_rect(fill = "#121212"),
             panel.background = element_rect(fill = "#121212"),
             plot.background = element_rect(fill = "#121212"),
@@ -506,16 +506,16 @@ server <- function(input, output, session) {
                           "\nExplicit: ", ifelse(track_explicit, "Yes", "No")
                         ))) +
       geom_bar(stat = "identity") +
-      scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "white")) +
+      scale_fill_manual(values = c("FALSE" = "#1ed760", "TRUE" = "#FFFFFF")) +
       labs(title = str_c("Tracks from Album: ", input$selected_album),
            x = "Track Name", y = "Popularity", fill = "Explicit") +
       theme(
-        axis.text.x = element_text(angle = 45, hjust = 1, color = "white"),
-        axis.text.y = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
-        legend.text = element_text(color = "white"),
-        legend.title = element_text(color = "white"),
+        axis.text.x = element_text(angle = 45, hjust = 1, color = "#FFFFFF"),
+        axis.text.y = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
+        legend.text = element_text(color = "#FFFFFF"),
+        legend.title = element_text(color = "#FFFFFF"),
         legend.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
         plot.background = element_rect(fill = "#121212"),
@@ -546,11 +546,11 @@ server <- function(input, output, session) {
     panel.background = element_rect(fill = "#121212"),
     legend.background = element_rect(fill = "#121212"),
     legend.key = element_rect(fill = "#121212"),
-    legend.text = element_text(color = "white"),
-    legend.title = element_text(color = "white"),
-    axis.text = element_text(color = "white"),
-    axis.title = element_text(color = "white"),
-    plot.title = element_text(color = "white"),
+    legend.text = element_text(color = "#FFFFFF"),
+    legend.title = element_text(color = "#FFFFFF"),
+    axis.text = element_text(color = "#FFFFFF"),
+    axis.title = element_text(color = "#FFFFFF"),
+    plot.title = element_text(color = "#FFFFFF"),
     panel.grid.major = element_line(color = "gray20")
   )
   
@@ -591,9 +591,9 @@ ggplotly(p, tooltip = "text")
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20")
       )
     
@@ -637,9 +637,9 @@ ggplotly(p, tooltip = "text")
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20") 
       )
     
@@ -671,9 +671,9 @@ ggplotly(p, tooltip = "text")
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20")
       )
     
@@ -698,9 +698,9 @@ ggplotly(p, tooltip = "text")
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20"),
         axis.text.y = element_text(angle = 45, hjust = 1)
       )
@@ -724,18 +724,18 @@ ggplotly(p, tooltip = "text")
                         text = str_c("Track: ", track_name, "\nArtist Name: ", track_artists, "\nPopularity: ", track_popularity, "\nFeature: ", feature_label))) +
       geom_bar(stat = "identity") +
       coord_flip() +
-      scale_fill_manual(values = c("With Feature" = "white", "No Feature" = "#1ed760")) +
+      scale_fill_manual(values = c("With Feature" = "#FFFFFF", "No Feature" = "#1ed760")) +
       labs(title = str_c("Tracks from", input$features_album), x = "Track Name", y = "Popularity", fill = "Has Feature") +
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
         legend.background = element_rect(fill = "#121212"),
         legend.key = element_rect(fill = "#121212"),
-        legend.text = element_text(color = "white"),
-        legend.title = element_text(color = "white"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
+        legend.text = element_text(color = "#FFFFFF"),
+        legend.title = element_text(color = "#FFFFFF"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20")
       )
     ggplotly(p, tooltip = "text")
@@ -766,9 +766,9 @@ ggplotly(p, tooltip = "text")
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20"),
         axis.text.x = element_text(angle = 45, hjust = 1)
       )
@@ -814,11 +814,11 @@ ggplotly(p, tooltip = "text")
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
-        legend.text = element_text(color = "white"),
-        legend.title = element_text(color = "white"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
+        legend.text = element_text(color = "#FFFFFF"),
+        legend.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20")
       )
     
@@ -884,9 +884,9 @@ ggplotly(p, tooltip = "text")
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20"),
       )
     
@@ -902,7 +902,7 @@ ggplotly(p, tooltip = "text")
                                                     "\nNegative: ", negative,
                                                     "\nNet Sentiment (Proportion): ", round(net_sentiment_prop, 3)))) +
       geom_line(color = "#1ed760", size = 0.8) +
-      geom_point(color = "white", size = 1.5) +
+      geom_point(color = "#FFFFFF", size = 1.5) +
       labs(
         title = "Net Sentiment Proportion of Lyrics by Year",
         x = "Year",
@@ -912,9 +912,9 @@ ggplotly(p, tooltip = "text")
       theme(
         plot.background = element_rect(fill = "#121212"),
         panel.background = element_rect(fill = "#121212"),
-        axis.text = element_text(color = "white"),
-        axis.title = element_text(color = "white"),
-        plot.title = element_text(color = "white"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20"),
       )
     
