@@ -5,8 +5,11 @@ For this project, we explored lyrical and musical trends using Spotify data from
 
 Key Features to Note:
 Top Artists/Albums tab - selecting a row in the table loads the corresponding Spotify embed, allowing users to instantly listen to top tracks by that artist or album without leaving the app
+
 Tracks with Features tab — dynamically detects “feat.” or “with” in track names to identify collaborations
+
 Lyric Analysis tab — uses the bing lexicon to visualize sentiment of common lyrics over time
+
 App-wide design - consistent dark mode styling and tooltip interactivity
 **ADD MORE**
 
