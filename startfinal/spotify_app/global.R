@@ -72,5 +72,6 @@ sentiment_by_year <- lyrics_by_year |>
   inner_join(bing_sentiments, by = "word") |>
   count(release_year, sentiment) |>
   pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) |>
-  mutate(net_sentiment = positive - negative)
+  mutate(net_sentiment = positive - negative) |>
+  mutate(net_sentiment_prop = (positive - negative) / (positive + negative))
 

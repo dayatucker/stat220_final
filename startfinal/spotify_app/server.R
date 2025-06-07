@@ -563,17 +563,17 @@ server <- function(input, output, session) {
   
   output$sentiment_year_plot <- renderPlotly({
     
-    p <- ggplot(sentiment_by_year, aes(x = release_year, y = net_sentiment, group = 1,
+    p <- ggplot(sentiment_by_year, aes(x = release_year, y = net_sentiment_prop, group = 1,
                                        text = str_c("Year: ", release_year,
                                                     "\nPositive: ", positive, 
                                                     "\nNegative: ", negative,
-                                                    "\nNet Sentiment: ", net_sentiment))) +
+                                                    "\nNet Sentiment (Proportion): ", round(net_sentiment_prop, 3)))) +
       geom_line(color = "#1ed760", size = 0.8) +
-      geom_point(color = "white", size = 1) +
+      geom_point(color = "white", size = 1.5) +
       labs(
-        title = "Net Sentiment of Lyrics by Year",
+        title = "Net Sentiment Proportion of Lyrics by Year",
         x = "Year",
-        y = "Net Sentiment (positive - negative)"
+        y = "Net Sentiment (Proportion)"
       ) +
       theme_minimal() +
       theme(
@@ -582,7 +582,7 @@ server <- function(input, output, session) {
         axis.text = element_text(color = "white"),
         axis.title = element_text(color = "white"),
         plot.title = element_text(color = "white"),
-        panel.grid.major = element_line(color = "gray20")
+        panel.grid.major = element_line(color = "gray20"),
       )
     
     ggplotly(p, tooltip = "text")
