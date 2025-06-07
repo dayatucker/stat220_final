@@ -28,6 +28,8 @@ server <- function(input, output, session) {
     }
   })
   
+  
+  # Contains the text content for each tab/subtab in the webpage
   output$main_content <- renderUI({
     switch(input$nav,
            "info_tab" = {
@@ -366,6 +368,8 @@ server <- function(input, output, session) {
     )
   })
   
+## Top Artists/Albums Tab  
+  
   # Top Artists/Albums Logic
   filtered_artists_year <- reactive({
     get_filtered_artists_year(combined_artists_tracks, input$selected_year)
@@ -383,6 +387,7 @@ server <- function(input, output, session) {
     get_filtered_albums(combined_albums_tracks, input$selected_year)
   })
   
+  # Artist Table
   output$artist_table <- renderDT({
     datatable(
       filtered_artists(), 
@@ -391,6 +396,7 @@ server <- function(input, output, session) {
       rownames = FALSE)
   })
   
+  # Album Table
   output$album_table  <- renderDT({
     datatable(
       filtered_albums(),  
@@ -399,6 +405,7 @@ server <- function(input, output, session) {
       rownames = FALSE) 
   })
   
+  # Selected Artist iframe
   output$top_artist_iframe <- renderUI({
     selected_row <- input$artist_table_rows_selected
     if (length(selected_row)) {
@@ -413,6 +420,7 @@ server <- function(input, output, session) {
     }
   })
   
+  # Selected Album iframe
   output$top_album_iframe <- renderUI({
     selected_row <- input$album_table_rows_selected
     if (length(selected_row)) {
@@ -428,6 +436,11 @@ server <- function(input, output, session) {
     }
   })
   
+  
+  
+  
+## Top Tracks Tab
+  
   # Dynamic Track Selectors
   output$artist_selector <- renderUI({
     choices <- combined_artists_tracks |> filter(charted_year == input$track_year) |> distinct(artist_name) |> arrange(artist_name)
@@ -439,6 +452,8 @@ server <- function(input, output, session) {
     selectInput("selected_album", "Select Album:", choices = choices$album_name)
   })
   
+  
+  # Selected Artist iframe
   output$artist_tracks_iframe <- renderUI({
     req(input$selected_artist)
     df <- combined_artists_tracks |>
@@ -451,6 +466,8 @@ server <- function(input, output, session) {
                 loading = "lazy")
   })
   
+  
+  # Selected Album iframe
   output$album_tracks_iframe <- renderUI({
     req(input$selected_album)
     df <- combined_albums_tracks |>
@@ -463,7 +480,8 @@ server <- function(input, output, session) {
                 loading = "lazy")
   })
   
-  # Top Artist/Album Tracks
+  
+  # Bar plot of top 10 tracks of selected artist against popularity score filled by explicit
   output$artist_tracks_plot <- renderPlotly({
     req(input$selected_artist)
     df <- combined_artists_tracks |>
@@ -494,6 +512,8 @@ server <- function(input, output, session) {
       layout(plot_bgcolor = "#121212", paper_bgcolor = "#121212")
   })
   
+  
+  # Bar plot of tracks of selected album against popularity score filled by explicit
   output$album_tracks_plot <- renderPlotly({
     req(input$selected_album)
     df <- combined_albums_tracks |>
@@ -526,7 +546,12 @@ server <- function(input, output, session) {
       layout(plot_bgcolor = "#121212", paper_bgcolor = "#121212")
   })
   
-  # Genre Tab
+  
+  
+  
+  
+  
+## Genre Tab
   output$genre_bar <- renderPlotly({
     req(input$selected_genres)
     df <- combined_artists_tracks |>
@@ -542,21 +567,22 @@ server <- function(input, output, session) {
       labs(title = "Number of Tracks per Genre by Year",
        x = "Year", y = "Unique Track Count", fill = "Genre") +
       theme(
-    plot.background = element_rect(fill = "#121212"),
-    panel.background = element_rect(fill = "#121212"),
-    legend.background = element_rect(fill = "#121212"),
-    legend.key = element_rect(fill = "#121212"),
-    legend.text = element_text(color = "#FFFFFF"),
-    legend.title = element_text(color = "#FFFFFF"),
-    axis.text = element_text(color = "#FFFFFF"),
-    axis.title = element_text(color = "#FFFFFF"),
-    plot.title = element_text(color = "#FFFFFF"),
-    panel.grid.major = element_line(color = "gray20")
-  )
-  
-ggplotly(p, tooltip = "text")
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        legend.background = element_rect(fill = "#121212"),
+        legend.key = element_rect(fill = "#121212"),
+        legend.text = element_text(color = "#FFFFFF"),
+        legend.title = element_text(color = "#FFFFFF"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
+        panel.grid.major = element_line(color = "gray20")
+      )
+    ggplotly(p, tooltip = "text")
   })
   
+  
+  # Table of all songs from top artists filtered by genre
   output$genre_table <- DT::renderDataTable({
     req(input$selected_genres)
     combined_artists_tracks |>
@@ -573,7 +599,13 @@ ggplotly(p, tooltip = "text")
       arrange(desc(popularity))
   })
   
-  # Years Since Release Tab
+  
+  
+  
+  
+## Years Since Release Tab
+  
+  # Track Popularity vs Years since Released Scatterplot
   output$years_release_plot <- renderPlotly({
     df <- combined_artists_tracks |>
       filter(!is.na(years_since_release),
@@ -600,19 +632,27 @@ ggplotly(p, tooltip = "text")
     ggplotly(p, tooltip = "text")
   })
   
-  # Track Duration Tab
+  
+  
+  
+## Track Duration Tab
+  
+  # Select Artist Dropdown
   output$duration_artist_selector <- renderUI({
     selectInput("duration_artist", "Select Artist:",
                 choices = c("All", sort(unique(combined_artists_tracks$artist_name))),
                 selected = "All")
   })
   
+  # Select Album Dropdown
   output$duration_album_selector <- renderUI({
     selectInput("duration_album", "Select Album:",
                 choices = c("All", sort(unique(combined_albums_tracks$album_name))),
                 selected = "All")
   })
   
+  
+  # Scatterplot of the track duration from every top 10 song from top artists against each track's popularity
   output$duration_artist_plot <- renderPlotly({
     req(input$duration_artist)
     
@@ -646,6 +686,8 @@ ggplotly(p, tooltip = "text")
     ggplotly(p, tooltip = "text")
   })
   
+  
+  # Scatterplot of the track duration from every top album against each track's popularity
   output$duration_album_plot <- renderPlotly({
     req(input$duration_album)
     
@@ -680,6 +722,7 @@ ggplotly(p, tooltip = "text")
     ggplotly(p, tooltip = "text")
   })
   
+  
   # Number of Tracks in Album Tab
   output$album_tracks_count_plot <- renderPlotly({
     req(input$tracks_year)
@@ -708,12 +751,15 @@ ggplotly(p, tooltip = "text")
     ggplotly(p, tooltip = "text")
   })
   
+  
   # Tracks with Features Tab
   output$features_album_selector <- renderUI({
     choices <- combined_albums_tracks |> filter(charted_year == input$features_year) |> distinct(album_name) |> arrange(album_name)
     selectInput("features_album", "Select Album:", choices = choices$album_name)
   })
   
+  
+  # Bar Plot of Track Popularity Score filled by if they have feature 
   output$featured_tracks_plot <- renderPlotly({
     req(input$features_album)
     df <- combined_albums_tracks |>
@@ -741,7 +787,11 @@ ggplotly(p, tooltip = "text")
     ggplotly(p, tooltip = "text")
   })
   
-  # New Album Releases Tab Logic
+  
+  
+  
+## New Album Releases Tab Logic
+  
   # Scatterplot of new album releases
   output$new_release_date_plot <- renderPlotly({
     new_releases_combined$release_date <- as.Date(new_releases_combined$release_date)
@@ -775,6 +825,7 @@ ggplotly(p, tooltip = "text")
     
     ggplotly(p, tooltip = "text")
   })
+  
   
   # Bar plot of how many releases per weekday
   output$weekday_track_count_plot <- renderPlotly({
@@ -825,6 +876,7 @@ ggplotly(p, tooltip = "text")
     ggplotly(p, tooltip = "text")
   })
   
+  
   # Lyric Analysis Tab
   output$lyric_word_selector <- renderUI({
     req(lyrics_words)
@@ -844,6 +896,7 @@ ggplotly(p, tooltip = "text")
                        selected = head(top_words, 5))
   })
   
+  
   # Faceted line plot: multiple sentiment words
   output$lyric_sentiment_trend <- renderPlotly({
     req(input$selected_lyric_words)
@@ -861,11 +914,21 @@ ggplotly(p, tooltip = "text")
       facet_wrap(~ word, scales = "free_y") +
       labs(title = "Sentiment Trend of Selected Lyric Words",
            x = "Year", y = "Count", color = "Sentiment") +
-      scale_color_manual(values = c("positive" = "#1ed760", "negative" = "#191414")) +
+      scale_color_manual(values = c("positive" = "#1ed760", "negative" = "#ffffff")) +
       theme_minimal() +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      theme(
+        plot.background = element_rect(fill = "#121212"),
+        panel.background = element_rect(fill = "#121212"),
+        axis.text = element_text(color = "#FFFFFF"),
+        axis.title = element_text(color = "#FFFFFF"),
+        plot.title = element_text(color = "#FFFFFF"),
+        panel.grid.major = element_line(color = "gray20"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.text = element_text(color = "#FFFFFF"),
+      )
     ggplotly(p)
   })
+  
   
   # Bar plot of top words by genre
   output$genre_barplot <- renderPlotly({
@@ -889,9 +952,9 @@ ggplotly(p, tooltip = "text")
         plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20"),
       )
-    
     ggplotly(p, tooltip = "text")
   })
+  
   
   # Line plot of sentiment analysis by year
   output$sentiment_year_plot <- renderPlotly({
@@ -917,7 +980,6 @@ ggplotly(p, tooltip = "text")
         plot.title = element_text(color = "#FFFFFF"),
         panel.grid.major = element_line(color = "gray20"),
       )
-    
     ggplotly(p, tooltip = "text")
   })
   
