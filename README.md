@@ -1,5 +1,7 @@
 # Spotify Music Explorer 2018-2024
-This repository contains the final project for STAT220, which explores trends in Spotify music data from 2018 to 2024. The project includes data wrangling, visualization, and a Shiny web app for interactive exploration.
+This repository contains the final project for STAT220.
+
+For this project, we explored lyrical and musical trends using Spotify data from 2018 to 2024. To acquire the data, we used the Spotify API to collect detailed information on tracks, albums, and artists, and an R wrapper for the Genius API to scrape song lyrics. We then wrangled this data by merging datasets, cleaning text (removing punctuation, annotations, etc.), and filtering out both English and Spanish stopwords to prepare the lyrics for analysis. To visualize the data, we created a series of interactive plotly charts in R, including genre-based word frequency plots, sentiment trends over time, and track popularity patterns. Finally, to communicate insights, we built an interactive Shiny dashboard that allows users to explore patterns in music and lyrics across years and genres, making the analysis accessible and engaging. This project aimed to better understand how lyrical content and musical success evolve over time and vary across genres.
 
 ## Files
 - `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization.
