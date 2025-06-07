@@ -111,13 +111,11 @@ Includes:
 - word
 
 ## Navigate Repo:
-Run `data_prep.R` and `lyrics_data_prep.R` first to load or update your dataset (optional and will take a while)???? 
-
-**Does she need to?***
-
-Go to `/spotify_app/` and run `global.R` and `ui.R`
-
-Launch the app from `server.R`
+1. Go to `startfinal`folder and select `/spotify_app/` folder.
+2. Open `global.R`,`ui.R`, `server.R`.
+3. Select all code from `global.R` and press command return.
+4. Do same for `ui.R`.
+6. Launch the app from `server.R`.
 
 ## Resources
 - Set up a Shiny app to use shinyjs: (https://www.rdocumentation.org/packages/shinyjs/versions/2.1.0/topics/useShinyjs)
