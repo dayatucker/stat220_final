@@ -15,8 +15,6 @@ Lyric Analysis tab – Performs sentiment analysis on lyrics using the bing lexi
 
 App-wide design – Features a cohesive dark mode Spotify theme, along with interactive tooltips.
 
-**ADD MORE**
-
 ## Published App Link
 
 ## Files
