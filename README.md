@@ -34,87 +34,87 @@ App-wide design – Features a cohesive dark mode Spotify theme, along with inte
 #### `all_tracks_*.csv`: 
 This contains track-level data for each year from 2018 to 2024 with each file containing one row per track. Tracks are associated with artists released on Spotify and it provides core data on song popularity, duration, explicitness. This was obtained via the Spotify Web API.
 
-Includes:
-- track_name
-- album_name
-- popularity
-- track_duration_ms
-- explicit
-- artist_id
-- artist_name
-- year
+- Includes:
+  - track_name
+  - album_name
+  - popularity
+  - track_duration_ms
+  - explicit
+  - artist_id
+  - artist_name
+  - year
 
 #### `combined_artists_tracks_2018_2024.csv`: 
 This contains artist-level summary generated from track data. Each row links songs to their artists and genre tags. It provides answers about genre evolution and changes in artist popularity over time. This was obtained via the Spotify Web API.
 
-Includes:
-- track_name
-- track_id
-- album_name
-- popularity
-- track_duration_ms
-- explicit
-- artist_id
-- release_year
-- artist_name
-- genres
-- charted_year
-- years_since_release
+- Includes:
+  - track_name
+  - track_id
+  - album_name
+  - popularity
+  - track_duration_ms
+  - explicit
+  - artist_id
+  - release_year
+  - artist_name
+  - genres
+  - charted_year
+  - years_since_release
 
 #### `combined_albums_tracks_2018_2024.csv`: 
 This is a aggregated dataset joining track and album-level info across all years (2018-2024). Songs grouped by album and artist and it enables information about album structure (like the number of tracks), duration, and feature patterns. This was obtained via the Spotify Web API.
 
-Includes:
-- album_id
-- album_name
-- release_date
-- total_tracks
-- popularity
-- album_type
-- track_id
-- track_name
-- track_number
-- track_artists
-- track_duration_ms
-- track_explicit (True/False)
-- charted_year
-- features
+- Includes:
+  - album_id
+  - album_name
+  - release_date
+  - total_tracks
+  - popularity
+  - album_type
+  - track_id
+  - track_name
+  - track_number
+  - track_artists
+  - track_duration_ms
+  - track_explicit (True/False)
+  - charted_year
+  - features
 
 #### `new_releases_combined.csv`:
 This contains all new album and track releases in 2024, including both main and featured artists. It focuses on April 2024 only, ideal for understanding the release trends. This was obtained via the Spotify Web API.
 
-Includes:
-- album_id
-- track_id
-- track_name
-- track_number
-- track_artists
-- track_duration_ms
-- track_explicit (True/False)
-- release_date
-- total_tracks
-- popularity
-- album_type
-- album_name
-- artist_name
-- album_url
-- charted_year
+- Includes:
+  - album_id
+  - track_id
+  - track_name
+  - track_number
+  - track_artists
+  - track_duration_ms
+  - track_explicit (True/False)
+  - release_date
+  - total_tracks
+  - popularity
+  - album_type
+  - album_name
+  - artist_name
+  - album_url
+  - charted_year
 
 #### `all_track_lyrics.csv`: 
 This contains full, cleaned lyrics for each track (one row per song). It is tied to tracks spanning 2018–2024; used for analyzing lyrical trends across time.
 
-Includes:
-- track_name
-- artist_name
-- lyrics
+- Includes:
+  - track_name
+  - artist_name
+  - lyrics
 
 #### `lyrics_words.csv`: 
 This contains a tokenized version of the lyrics dataset — one row per word per track. Supports word frequency analysis, sentiment analysis, and tracking word trends over time.
 
-Includes:
-- track_name
-- artist_name
-- word
+- Includes:
+  - track_name
+  - artist_name
+  - word
 
 ## Navigate Repo:
 1. Go to `startfinal`folder and select `/spotify_app/` folder.
