@@ -31,7 +31,8 @@ App-wide design – Features a cohesive dark mode Spotify theme, along with inte
 - `.txt` files: **Need to be deleted from repo**
 
 ## Datasets
-#### `all_tracks_*.csv`: Multiple files, each containing track-level data for a specific year (2018–2024).
+#### `all_tracks_*.csv`: 
+This contains track-level data for each year from 2018 to 2024 with each file containing one row per track. Tracks are associated with artists released on Spotify and it provides core data on song popularity, duration, explicitness. This was obtained via the Spotify Web API.
 Includes:
 - track_name
 - album_name
@@ -42,7 +43,8 @@ Includes:
 - artist_name
 - year
 
-#### `combined_artists_tracks_2018_2024.csv`: Artist-level summary generated from track data.
+#### `combined_artists_tracks_2018_2024.csv`: 
+This contains artist-level summary generated from track data. Each row links songs to their artists and genre tags. It provides answers about genre evolution and changes in artist popularity over time. This was obtained via the Spotify Web API.
 Includes:
 - track_name
 - track_id
@@ -57,7 +59,8 @@ Includes:
 - charted_year
 - years_since_release
 
-#### `combined_albums_tracks_2018_2024.csv`: Aggregated dataset joining track and album-level info across all years (2018-2024).
+#### `combined_albums_tracks_2018_2024.csv`: 
+This is a aggregated dataset joining track and album-level info across all years (2018-2024). Songs grouped by album and artist and it enables information about album structure (like the number of tracks), duration, and feature patterns. This was obtained via the Spotify Web API.
 Includes:
 - album_id
 - album_name
@@ -74,7 +77,8 @@ Includes:
 - charted_year
 - features
 
-#### `new_releases_combined.csv`: Dataset of new music releases scraped from Spotify's API.
+#### `new_releases_combined.csv`:
+This contains all new album and track releases in 2024, including both main and featured artists. It focuses on April 2024 only, ideal for understanding the release trends. This was obtained via the Spotify Web API.
 Includes:
 - album_id
 - track_id
@@ -92,13 +96,15 @@ Includes:
 - album_url
 - charted_year
 
-#### `all_track_lyrics.csv`: One row per song with cleaned full lyrics.
+#### `all_track_lyrics.csv`: 
+This contains full, cleaned lyrics for each track (one row per song). It is tied to tracks spanning 2018–2024; used for analyzing lyrical trends across time.
 Includes:
 - track_name
 - artist_name
 - lyrics
 
-#### `lyrics_words.csv`: One row per word (token) per song for word-level analysis.
+#### `lyrics_words.csv`: 
+This contains a tokenized version of the lyrics dataset — one row per word per track. Supports word frequency analysis, sentiment analysis, and tracking word trends over time.
 Includes:
 - track_name
 - artist_name
