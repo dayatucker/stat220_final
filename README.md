@@ -7,14 +7,14 @@ For this project, we explored lyrical and musical trends using Spotify data from
 - `data_prep.R`: Script for cleaning and wrangling raw datasets. Produces combined datasets for analysis and visualization.
 - `lyrics_data_prep.R`:
 - `/spotify_app/`:
+  - `/data/`: Directory containing all processed datasets in .csv format
+  - `/www/`:
   - `global.R`:
   - `server.R`:
   - `ui.R`:
 - `main.Rmd`: Main file for graphs and visualizations for the report
-- `/data/`: Directory containing all processed datasets in .csv format
-- `/www/`:
 - `final_proj_sketch.Rmd`: Initial project sketch submitted during the proposal phase.
-- `.txt` files: Delete later
+- `.txt` files: **Need to be deleted from repo**
 
 ## Datasets
 #### `all_tracks_*.csv`: Multiple files, each containing track-level data for a specific year (2018–2024)
